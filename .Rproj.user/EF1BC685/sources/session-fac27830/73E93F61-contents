@@ -1,0 +1,78 @@
+---
+title: "try"
+author: "Julia"
+date: "2023-09-08"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+
+
+min(DATA$mom.age)
+max(DATA$mom.age)
+```
+```{r}
+ggplot(data= DATA, aes(y = weight))+
+  geom_col(aes(x= black))
+```
+
+
+1. Before running any model, pick any two variables and attempt to show an (interesting) relation via  visualization. This requires one to formulate a question, and to communicate clearly a conclusion  based on data visualization. Ideally this would suggest ways to act on the issue. (For example, during  pregnancy, does the amount of smoking seem to diminish with education level? This can provide  guidance on where to place educational ads regarding smoking during pregnancies.)
+```{r}
+plot1 <- DATA %>% select(mom.age, smoke) %>% group_by(mom.age) %>% count(smoke)
+plot1$smoke <- as.integer(plot1$smoke)
+plot1$smoke <- plot1$smoke %>% factor(c(1,0))
+plot1 %>% View()
+
+ggplot(data = plot1)+
+  geom_col(aes(x = mom.age, y = n, fill = smoke), position = position_stack(reverse = TRUE))+
+  scale_fill_manual(values = c("1" = "blue", "0" = "black"),
+                    labels = c("1" = "yes", "0" = "no")) +
+  labs(title = "Pregnancy Women Smoke over Ages", x = "Mom's age", y = "Population")
+```
+2. Next consider the 10 dummy (binary) variables in Exhibit 1. Test independence among all 45 combinations. First using the traditional 0.05 rule for each. Second controlling for multiple testing via Bonferroni correction. Any discrepancies? If so, which one do you believe got it wrong this time? 
+
+```{r}
+MatrixComp <- as.matrix( cbind( DATA$boy, DATA$tri1, DATA$tri2, DATA$tri3, DATA$black, DATA$married, DATA$ed.hs, DATA$ed.smcol, DATA$ed.col, DATA$smoke ))  
+### Here is the associated LAbels (for convenience)
+LabelsTmp <- c( "boy", "tri1", "tri2", "tri3", "black", "married", "ed.hs", "ed.smcol", "ed.col","smoke")
+### Number of columns (should be 10)
+NumCol <- ncol(MatrixComp)
+### Next we compute the p-values for each pair
+pvals <- rep(0, NumCol*(NumCol-1)/2) 
+### Also will collect the pair label
+ListLabels <- rep("", NumCol*(NumCol-1)/2) 
+k <- 0
+for (i in 1:(NumCol-1) ){
+  for ( j in (i+1):NumCol ){
+    k <- k+1
+    ### Creates the entries of the contingency table
+    m00 <- sum( (MatrixComp[,i] == 0) & (MatrixComp[,j] == 0) ) 
+    m01 <- sum( (MatrixComp[,i] == 0) & (MatrixComp[,j] == 1) ) 
+    m10 <- sum( (MatrixComp[,i] == 1) & (MatrixComp[,j] == 0) ) 
+    m11 <- sum( (MatrixComp[,i] == 1) & (MatrixComp[,j] == 1) ) 
+    ### Construct the contingency table
+    ContingencyMatrix <- as.table(rbind(c(m00, m01), c(m10, m11)))
+    ### Perform the Pearson chi squares test for independent of factors
+    # store the p-value of the test 
+    pvals[k] <- chisq.test(ContingencyMatrix)$p.value  
+    # create the Label
+    ListLabels[k] <- paste(LabelsTmp[i],LabelsTmp[j], sep=" and ")  
+  }  
+}
+insignificant <- pvals > 0.05
+ListLabels[insignificant]
+
+insignificant2 <- pvals > 0.05/45
+ListLabels[insignificant2]
+```
+3. In your opinion, can any of the variables provided in Exhibit 1 help to predict birthweight? Since opinions do not provide strong arguments, provide a simple evidence based on data.
+```{r}
+modelq3 <- lm(weight ~ black + married + boy + tri1 + tri2 + tri3 + ed.hs + ed.smcol + ed.col + mom.age + smoke + cigsper + m.wtgain + mom.age2, data = DATA)
+summary(modelq3)
+```
+4. Run a multiple regression with 14 of the variables described in Exhibit 1 (all except for id, birmon, tri.none, and novisit). Which variables are statistically significant? Apply the standard 0.05 cut-off rule and also the Bonferroni correction to account for multiplicity. Any discrepancies? If so, which one do you believe got it wrong this time?
+
+
