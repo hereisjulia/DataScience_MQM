@@ -1,0 +1,94 @@
+---
+title: "class3_coding"
+author: "Julia"
+date: "2023-09-14"
+output: html_document
+---
+
+```{r}
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(stringr)
+library(cli)
+library(randomForest)
+```
+
+```{r}
+customerChurn <- read_csv("./ClassMaterials/customerchurn.csv")
+View(customerChurn)
+summary(customerChurn)
+```
+
+```{r}
+ggplot(data = customerChurn)+
+  geom_point(aes(x = MonthlyCharges, y= TotalCharges, color= Churn))
+```
+```{r}
+lm(Churn ~ ., data = customerChurn)
+```
+
+```{r}
+customerChurn$Churn <- customerChurn$Churn %>% str_replace_all("Yes", "1") %>% str_replace_all("No", "0") %>% as.numeric()
+```
+
+
+
+```{r}
+plot(factor(Churn) ~ factor(gender), data = customerChurn)
+plot(factor(Churn) ~ factor(InternetService), data = customerChurn)
+```
+
+```{r}
+plot(factor(Churn) ~ factor(tenure), data = customerChurn)
+```
+
+
+# Binary Regression
+
+```{r}
+glm(Churn ~ tenure + MonthlyCharges, data = customerChurn, family = "binomial")
+```
+
+# Classification Tree
+
+```{r}
+tree(Churn ~ tenure + MonthlyCharges , data = customerChurn)
+```
+
+
+# Random Forest
+
+```{r}
+randomForest(Churn ~ .-customerID, data = customerChurn,
+             nodesize = 5, ntree = 500, mtry = 4)
+```
+
+
+
+# CLASS 4
+
+```{r}
+install.packages("glmnet")
+library(glmnet)
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

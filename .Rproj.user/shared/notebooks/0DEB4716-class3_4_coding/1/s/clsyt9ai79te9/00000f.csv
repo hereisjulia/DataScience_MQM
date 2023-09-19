@@ -1,0 +1,103 @@
+"0","install.packages(""glmnet"")
+"
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","also installing the dependencies ‘iterators’, ‘foreach’, ‘shape’, ‘RcppEigen’
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/iterators_1.0.14.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 353033 bytes (344 KB)
+"
+"2","downloaded 344 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/foreach_1.5.2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 147994 bytes (144 KB)
+"
+"2","downloaded 144 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/shape_1.4.6.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 786162 bytes (767 KB)
+"
+"2","downloaded 767 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/RcppEigen_0.3.3.9.3.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 2289558 bytes (2.2 MB)
+"
+"2","downloaded 2.2 MB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/glmnet_4.1-8.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 2471494 bytes (2.4 MB)
+"
+"2","downloaded 2.4 MB
+
+"
+"1","package ‘iterators’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘foreach’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘shape’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘RcppEigen’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘glmnet’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\RtmpUB4361\downloaded_packages"
+"1",""
+"1","
+"
+"0","install.packages(""glmnet"")"
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/glmnet_4.1-8.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 2471494 bytes (2.4 MB)
+"
+"2","downloaded 2.4 MB
+
+"
+"1","package ‘glmnet’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\RtmpUB4361\downloaded_packages"
+"1",""
+"1","
+"
+"0","library(glmnet)"
+"2","Warning: package ‘glmnet’ was built under R version 4.3.1"
+"2","Loading required package: Matrix
+"
+"2","Warning: package ‘Matrix’ was built under R version 4.3.1"
+"2","Loaded glmnet 4.1-8
+"

@@ -1,0 +1,6 @@
+"0","randomForest(Churn ~ .-customerID, data = customerChurn,
+             nodesize = 5, ntree = 500, mtry = 4)
+"
+"2","Error in na.fail.default(list(Churn = c(0, 0, 1, 0, 1, 1, 0, 0, 1, 0,  : 
+  missing values in object
+"

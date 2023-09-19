@@ -1,5 +1,0 @@
-"0","tree(Churn ~ tenure + MonthlyCharges , data = customerChurn)
-"
-"2","Error in tree(Churn ~ tenure + MonthlyCharges, data = customerChurn) : 
-  is_string(root) is not TRUE
-"
