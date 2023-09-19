@@ -57,15 +57,6 @@ A,B,C,D,E,F,G - the coverage options:
 # Q1
 Pick two (or more) variables and attempt to show a relation between them via visualization. As discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). 
 
-
-## time and location
-
-`shopping_pt`, `record_type`, `day`, `time`, `state`, `location`
-
-```{r}
-timeLocation <- data[,c(25,2,3,4,5,6,7)]
-```
-
 ## customer group
 
 `group_size`, `homeowner`, `car_age`, `car_value`, `risk_factor`, `age_oldest`, `age_youngest`, `married_couple`
@@ -100,35 +91,26 @@ ggplot(data = plot1)+
 
 # Q2
 
-Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE 
-based on the observed variables. Pick two variables of your model, describe their marginal 
-impact on the quote, and comment the interpretation from the business perspective.
+Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
+
+```{r}
+glm(cost ~ day+state+homeowner+car_age +car_value + risk_factor + age_oldest + age_youngest + married_couple + C_previous + duration_previous + A +B+C+D+E+F+G
+ , data = data) %>% summary()
+
+```
 
 
 # Q3
 
-Suppose that a customer will pick the lowest between the quote you provide and that
-ALLSTATE provides. Build a model framework (follow/adapt steps in Model Framework in Class
-3 for the Churn Problem) to maximize expected revenue1 from a customer given the observed 
-characteristics. This includes the mathematical model, description of a decomposition strategy, 
-the associated core tasks, and specific data mining methods you would choose. For each core 
-task comment if it can and if it cannot be implemented with the available data.
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected revenue1 from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
+
+
 
 # Q4
-Suppose that a customer will pick the lowest between the quote you provide and that
-ALLSTATE provides. Aiming to maximize expected revenue2
-, provide quotes for each of the 
-three customers specified in “new.customers”. Clearly state which core task and which data 
-mining method you used to provide the quote.
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
 
 # Q5
-Suppose next that the customer might not accept either of the two quotes (but he will consider 
-only the smallest of the quotes). Build a model framework (follow/adapt steps in Model 
-Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer 
-given the observed characteristics. This includes the mathematical model, description of a 
-decomposition strategy, the associated core tasks, and specific data mining methods you would 
-choose. For each core task comment if it can and if it cannot be implemented with the available 
-data.
+Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
 
 
 
