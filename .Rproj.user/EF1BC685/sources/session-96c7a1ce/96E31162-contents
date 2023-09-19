@@ -71,6 +71,20 @@ plot(factor(homeowner) ~ cost, col = plot2Color, xlab = "Quote for customer", yl
 ```
 For the customers who don't own any houses, they seems to pay more for their insurance.
 
+## Car
+```{r}
+CarEvaluate <- data[, c(25, 10,11)] %>% 
+  group_by(car_value, car_age) %>% 
+  summarize(avg_cost = mean(cost), count = length(avg_cost))
+
+
+ggplot(data = CarEvaluate)+
+  geom_point(aes(x = car_age, y = avg_cost, color = car_value))+
+  theme_bw()
+```
+
+
+
 ## Coverage
 ```{r}
 coverage <- data[, c(25,16:24)]
