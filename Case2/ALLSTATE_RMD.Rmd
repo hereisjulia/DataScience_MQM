@@ -14,7 +14,7 @@ library(stringr)
 ```
 
 ```{r}
-data <- read_csv("./Case2/ALLSTATEcost.csv")
+data <- read_csv("E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case2/ALLSTATEcost.csv")
 summary(data)
 ```
 # Task Description
@@ -65,6 +65,8 @@ Pick two (or more) variables and attempt to show a relation between them via vis
 customerGroup <- data[, c(25, 8:15)]
 customerGroup$homeowner <- customerGroup$homeowner %>% as.character() %>% str_replace_all("1", "Yes") %>% str_replace_all("0", "No")
 
+library(RColorBrewer)
+plot2Color <- brewer.pal(n = 3, name = "Pastel1")
 plot(factor(homeowner) ~ cost, col = plot2Color, xlab = "Quote for customer", ylab = "Homeowner", data = customerGroup)
 ```
 For the customers who don't own any houses, they seems to pay more for their insurance.
@@ -94,9 +96,9 @@ ggplot(data = plot1)+
 Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
 
 ```{r}
-glm(cost ~ day+state+homeowner+car_age +car_value + risk_factor + age_oldest + age_youngest + married_couple + C_previous + duration_previous + A +B+C+D+E+F+G
- , data = data) %>% summary()
-
+modelq2 <- glm(cost ~ day+state+homeowner+car_age +car_value + risk_factor + age_oldest + age_youngest + married_couple + C_previous + duration_previous + A +B+C+D+E+F+G
+ , data = data)
+summary(modelq2)
 ```
 
 
@@ -108,6 +110,28 @@ Suppose that a customer will pick the lowest between the quote you provide and t
 
 # Q4
 Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+```{r}
+new.customers <- readRDS("NewCustomers.Rda")
+source("DataAnalyticsFunctions.R")
+
+#Error: variables ‘day’, ‘homeowner’, ‘risk_factor’, ‘married_couple’, ‘C_previous’ were specified with different types from the fit
+class(data$C_previous)
+class(new.customers$married_couple)
+new.customers$day <- as.numeric(new.customers$day)
+new.customers$homeowner <- as.numeric(new.customers$homeowner)
+new.customers$risk_factor <- as.numeric(new.customers$risk_factor)
+new.customers$married_couple <- as.numeric(new.customers$married_couple)
+new.customers$C_previous <- as.numeric(new.customers$C_previous)
+
+# predict
+PredictionQ4 <- predict(modelq2, newdata = new.customers)
+
+# Its kinda heard  here, but i think we have to usilize all the functions he set up for us. That will make the mining process easier.
+# And also this should use the methods tought in class 4.... but i'm still not getting it.
+
+R2(PredictionQ4, )
+```
+
 
 # Q5
 Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.

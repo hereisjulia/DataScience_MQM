@@ -1,5 +1,4 @@
-"0","glm(cost ~ day+state+homeowner+car_age +car_value + risk_factor + age_oldest + age_youngest + married_couple + C_previous + duration_previous + A +B+C+D+E+F+G
- , data = data) %>% summary()
+"0","summary(modelq2)
 "
 "1","
 Call:
