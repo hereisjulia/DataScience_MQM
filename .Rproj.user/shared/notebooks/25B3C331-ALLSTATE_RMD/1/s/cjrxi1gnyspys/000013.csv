@@ -1,0 +1,4 @@
+"0","DATA <- data[,!(names(ALLcost) %in% drop)]
+"
+"2","Error: object 'ALLcost' not found
+"
