@@ -7,7 +7,7 @@
 source("DataAnalyticsFunctions.R")
 
 ### Load data data
-churndata <- read.csv("customerchurn.csv")
+churndata <- read.csv("./ClassMaterials/customerchurn.csv")
 ### if you want to visualize the data in a spreadsheet view
 ### uncomment the line below (works in R Studio)
 ### View(churndata) 
@@ -146,9 +146,9 @@ Rsq
 #######################################################
 ### Run Classification Tree
 ### install the required packages some packages
-installpkg("tree")
+install.packages("tree")
 library(tree)
-installpkg("partykit")
+install.packages("partykit")
 library(partykit)
 
 ### This runs the tree. The formula describes what is the label and 

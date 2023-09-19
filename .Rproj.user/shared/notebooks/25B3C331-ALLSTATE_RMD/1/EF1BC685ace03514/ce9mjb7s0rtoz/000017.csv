@@ -1,0 +1,9 @@
+"0","modelq2pred <- predict(modelq2, newdata = new.customers)
+"
+"2","Warning: variable 'day' is not a factor"
+"2","Warning: variable 'homeowner' is not a factor"
+"2","Warning: variable 'risk_factor' is not a factor"
+"2","Warning: variable 'married_couple' is not a factor"
+"2","Warning: variable 'C_previous' is not a factor"
+"2","Error: variables ‘day’, ‘homeowner’, ‘risk_factor’, ‘married_couple’, ‘C_previous’ were specified with different types from the fit
+"

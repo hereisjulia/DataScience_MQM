@@ -103,7 +103,7 @@ plot1 <- coverage_long %>% group_by(option, level) %>% summarize(mean = mean(cos
 ggplot(data = plot1)+
   geom_point(aes(x = level, y = `mean`, size = `number_of_deal`, color = option))+
   scale_color_brewer(palette = "Set2")+
-  labs(title = "Coverage Options & Amount vs. Quotes", x = "Quote for customers", y = "Level of Coverage")+
+  labs(title = "Coverage Options & Amount vs. Quotes", x = "level of Coverage", y = "Quote for customers")+
   facet_wrap(~option, ncol = 3)+
   theme_bw()
 ```
@@ -114,8 +114,19 @@ ggplot(data = plot1)+
 Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
 
 ```{r}
+new.customers <- readRDS("NewCustomers.Rda")
+new.customers$day <- as.numeric(new.customers$day)
+new.customers$homeowner <- as.numeric(new.customers$homeowner)
+new.customers$risk_factor <- as.numeric(new.customers$risk_factor)
+new.customers$married_couple <- as.numeric(new.customers$married_couple)
+new.customers$C_previous <- as.numeric(new.customers$C_previous)
+
+str(DATA)
+str(new.customers)
 modelq2 <- glm(cost ~. , data = DATA)
 summary(modelq2)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+1 - (modelq2$dev/modelq2$null)
 ```
 
 
@@ -130,16 +141,14 @@ Suppose that a customer will pick the lowest between the quote you provide and t
 ```{r}
 # Regression
 
-new.customers <- readRDS("NewCustomers.Rda")
 source("DataAnalyticsFunctions.R")
 #Error: variables ‘day’, ‘homeowner’, ‘risk_factor’, ‘married_couple’, ‘C_previous’ were specified with different types from the fit
-class(data$C_previous)
-class(new.customers$married_couple)
-new.customers$day <- as.numeric(new.customers$day)
-new.customers$homeowner <- as.numeric(new.customers$homeowner)
-new.customers$risk_factor <- as.numeric(new.customers$risk_factor)
-new.customers$married_couple <- as.numeric(new.customers$married_couple)
-new.customers$C_previous <- as.numeric(new.customers$C_previous)
+str(data_cleaned)
+str(new.customers)
+coloumns <- names(new.customers)
+for (col_name in coloumns) {
+  new.customers[[col_name]] <- as.numeric(new.customers[[col_name]])
+}
 ```
 
 ## Regression Model
@@ -161,7 +170,7 @@ drop2 <- c("state", "car_value")
 data_cleaned <- data_cleaned[, !(names(data_cleaned) %in% drop2)]
 
 # 创建决策树模型
-ourtree <- tree(cost ~ ., data = data_cleaned)
+ourtree <- tree(cost ~ homeowner + car_age, data = data_cleaned)
 
 # 打印模型摘要
 summary(ourtree)
@@ -173,7 +182,42 @@ plot(ourtree)
 text(ourtree, label = "yval")
 
 
-ourtree[[1]]$yprob[,2]
+partition.tree(ourtree, label = "yval", add = FALSE)
+
+predict(ourtree, newdata = new.customers)
+
+```
+```{r}
+summary(modelq2)
+```
+```{r}
+install.packages("tree") 
+install.packages('rpart') 
+install.packages('party') 
+install.packages('sandwich') 
+library('sandwich') 
+library('party') 
+library('rpart') 
+```
+```{r}
+
+model1<-tree(cost~., data = data_cleaned) 
+model2 <- ctree(cost~., data = data_cleaned) 
+model2pred <- predict (model2, newdata = new.customers) 
+model3 <- rpart(cost~., data = data_cleaned) 
+model3pred <- predict (model3, newdata = new.customers) 
+
+modelq2pred
+model2pred
+model3pred
+```
+
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+```{r}
+modelq2pred
+y <- c(549,627,619)
+R2(y, modelq2pred,"gaussian")
+
 ```
 
 

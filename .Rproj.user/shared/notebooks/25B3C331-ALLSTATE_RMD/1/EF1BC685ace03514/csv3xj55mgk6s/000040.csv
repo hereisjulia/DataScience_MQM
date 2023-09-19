@@ -1,0 +1,30 @@
+"0","# 打印模型摘要
+summary(ourtree)
+"
+"1","
+Regression tree:
+"
+"1","tree(formula = cost ~ homeowner + car_age, data = data_cleaned)
+"
+"1","Number of terminal nodes:  5 
+"
+"1","Residual mean deviance:  1994 = 18360000 / 9206 
+"
+"1","Distribution of residuals:
+"
+"1","    Min. "
+"1"," 1st Qu. "
+"1","  Median "
+"1","    Mean "
+"1"," 3rd Qu. "
+"1","    Max. "
+"1","
+"
+"1","-192.600 "
+"1"," -30.660 "
+"1","  -2.642 "
+"1","   0.000 "
+"1","  28.340 "
+"1"," 225.000 "
+"1","
+"

@@ -1,0 +1,6 @@
+"0","ggplot(data = CarEvaluate)+
+  geom_point(aes(x = car_age, y = avg_cost, color = car_value))+
+  theme_bw()
+"
+"2","Error: object 'CarEvaluate' not found
+"

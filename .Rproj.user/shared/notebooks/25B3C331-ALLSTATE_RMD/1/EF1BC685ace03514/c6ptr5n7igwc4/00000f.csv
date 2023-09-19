@@ -1,0 +1,222 @@
+"0","install.packages(""rpart"")
+"
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/rpart_4.1.19.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 951084 bytes (928 KB)
+"
+"2","downloaded 928 KB
+
+"
+"1","package ‘rpart’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\Rtmp29FaW9\downloaded_packages"
+"1",""
+"1","
+"
+"0","install.packages('party') "
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","also installing the dependencies ‘TH.data’, ‘matrixStats’, ‘multcomp’, ‘modeltools’, ‘strucchange’, ‘coin’, ‘zoo’, ‘sandwich’
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/TH.data_1.1-2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 8825500 bytes (8.4 MB)
+"
+"2","downloaded 8.4 MB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/matrixStats_1.0.0.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 531706 bytes (519 KB)
+"
+"2","downloaded 519 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/multcomp_1.4-25.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 745594 bytes (728 KB)
+"
+"2","downloaded 728 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/modeltools_0.2-23.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 225853 bytes (220 KB)
+"
+"2","downloaded 220 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/strucchange_1.5-3.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 946908 bytes (924 KB)
+"
+"2","downloaded 924 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/coin_1.4-2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 1445003 bytes (1.4 MB)
+"
+"2","downloaded 1.4 MB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/zoo_1.8-12.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 1020283 bytes (996 KB)
+"
+"2","downloaded 996 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/sandwich_3.0-2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 1453040 bytes (1.4 MB)
+"
+"2","downloaded 1.4 MB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/party_1.3-13.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 919826 bytes (898 KB)
+"
+"2","downloaded 898 KB
+
+"
+"1","package ‘TH.data’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘matrixStats’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘multcomp’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘modeltools’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘strucchange’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘coin’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘zoo’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘sandwich’ successfully unpacked and MD5 sums checked
+"
+"1","package ‘party’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\Rtmp29FaW9\downloaded_packages"
+"1",""
+"1","
+"
+"0","install.packages('party') "
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/party_1.3-13.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 919826 bytes (898 KB)
+"
+"2","downloaded 898 KB
+
+"
+"1","package ‘party’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\Rtmp29FaW9\downloaded_packages"
+"1",""
+"1","
+"
+"0","install.packages('sandwich') "
+"2","WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+"
+"2","Installing package into ‘C:/Users/Ya Chiao Tsai/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/sandwich_3.0-2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 1453040 bytes (1.4 MB)
+"
+"2","downloaded 1.4 MB
+
+"
+"1","package ‘sandwich’ successfully unpacked and MD5 sums checked
+"
+"1","
+"
+"1",""
+"1","The downloaded binary packages are in
+	C:\Users\Ya Chiao Tsai\AppData\Local\Temp\Rtmp29FaW9\downloaded_packages"
+"1",""
+"1","
+"
+"0","library('sandwich') "
+"2","Warning: package ‘sandwich’ was built under R version 4.3.1"
+"0","library('party') "
+"2","Warning: package ‘party’ was built under R version 4.3.1"
+"2","Loading required package: grid
+"
+"2","Loading required package: mvtnorm
+"
+"2","Warning: package ‘mvtnorm’ was built under R version 4.3.1"
+"2","Loading required package: modeltools
+"
+"2","Loading required package: stats4
+"
+"2","Loading required package: strucchange
+"
+"2","Warning: package ‘strucchange’ was built under R version 4.3.1"
+"2","Loading required package: zoo
+"
+"2","Warning: package ‘zoo’ was built under R version 4.3.1"
+"2","
+Attaching package: ‘zoo’
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+"
+"0","library('rpart') "
+"2","Warning: package ‘rpart’ was built under R version 4.3.1"
+"0","model2 <- ctree(cost~., data = DATA) "
+"2","Error in trafo(data = data, numeric_trafo = numeric_trafo, factor_trafo = factor_trafo,  : 
+  data class “character” is not supported
+"
