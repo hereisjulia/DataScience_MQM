@@ -10,6 +10,7 @@ library(readxl)
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(stringr)
 ```
 
 ```{r}
@@ -23,42 +24,111 @@ To predict competitior's quotes by the given data.
 
 Target Variable: cost
 
-`customer_ID` - A unique identifier for the customer
-`shopping_pt` - Unique identifier for the shopping point of a given customer - 地點
-`record_type` - 0=shopping point, 1=purchase point
-`day` - Day of the week (0-6, 0=Monday)
-`time` - Time of day (HH:MM)
-`state` - State where shopping point occurred
-`location` - Location ID where shopping point occurred
-`group_size` - How many people will be covered under the policy (1, 2, 3 or 4)
-`homeowner` - Whether the customer owns a home or not (0=no, 1=yes)
-`car_age` - Age of the customer’s car
-`car_value` - How valuable was the customer’s car when new
-`risk_factor` - An ordinal assessment of how risky the customer is (1, 2, 3, 4 or NA)
-`age_oldest` - Age of the oldest person in customer's group
-`age_youngest` - Age of the youngest person in customer’s group
-`married_couple` - Does the customer group contain a married couple (0=no, 1=yes)
-`C_previous` - What the customer formerly had or currently has for product option C
+1. `customer_ID` - A unique identifier for the customer
+2. `shopping_pt` - Unique identifier for the shopping point of a given customer - 地點
+3. `record_type` - 0=shopping point, 1=purchase point
+4. `day` - Day of the week (0-6, 0=Monday)
+5. `time` - Time of day (HH:MM)
+6. `state` - State where shopping point occurred - 地點
+7. `location` - Location ID where shopping point occurred - 地點
+8. `group_size` - How many people will be covered under the policy (1, 2, 3 or 4) - 族群分析
+9. `homeowner` - Whether the customer owns a home or not (0=no, 1=yes)
+10. `car_age` - Age of the customer’s car
+11. `car_value` - How valuable was the customer’s car when new
+12. `risk_factor` - An ordinal assessment of how risky the customer is (1, 2, 3, 4 or NA)
+13. `age_oldest` - Age of the oldest person in customer's group - 族群分析
+14. `age_youngest` - Age of the youngest person in customer’s group - 族群分析
+15. `married_couple` - Does the customer group contain a married couple (0=no, 1=yes) - 族群分析
+16. `C_previous` - What the customer formerly had or currently has for product option C
 (0=nothing, 1, 2, 3,4 or NA)
-`duration_previous` - how long (in years) the customer was covered by their previous
-issuer (duration or NA)
+17. `duration_previous` - how long (in years) the customer was covered by their previous issuer (duration or NA)
 A,B,C,D,E,F,G - the coverage options: 
-`A` = Collision (levels: 0, 1, 2); 
-`B` = Towing (levels: 0, 1); 
-`C` = Bodily Injury (BI, levels: 1, 2, 3, 4); 
-`D` = Property Damage (PD, levels 1, 2, 3); 
-`E` = Rental Reimbursement (RR, levels: 0, 1); 
-`F` = Comprehensive (Comp, levels: 0, 1, 2, 3);
-`G` = Medical/Personal Injury Protection (Med/PIP, levels: 1, 2, 3, 4)
+`A` = Collision (levels: 0, 1, 2);              - 碰撞
+`B` = Towing (levels: 0, 1);                    - 拖走（違規停放的車輛）
+`C` = Bodily Injury (BI, levels: 1, 2, 3, 4);   - 身體有受傷 (賠對方)
+`D` = Property Damage (PD, levels 1, 2, 3);     - 物品損害 (賠對方)
+`E` = Rental Reimbursement (RR, levels: 0, 1);  - 租金報銷: 不幸發生車禍意外，汽車送修期間，保險公司會承擔租車的費用。
+`F` = Comprehensive (Comp, levels: 0, 1, 2, 3); - 其他
+`G` = Medical/Personal Injury Protection        - 医疗费用和个人身体伤害保护
+      (Med/PIP, levels: 1, 2, 3, 4)
+25. `cost` - cost of the quoted coverage options (i.e., ALLSTATE’s quote to the customer)
 
 
+# Q1
+Pick two (or more) variables and attempt to show a relation between them via visualization. As discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). 
 
 
+## time and location
+
+`shopping_pt`, `record_type`, `day`, `time`, `state`, `location`
+
+```{r}
+timeLocation <- data[,c(25,2,3,4,5,6,7)]
+```
+
+## customer group
+
+`group_size`, `homeowner`, `car_age`, `car_value`, `risk_factor`, `age_oldest`, `age_youngest`, `married_couple`
+
+```{r}
+customerGroup <- data[, c(25, 8:15)]
+customerGroup$homeowner <- customerGroup$homeowner %>% as.character() %>% str_replace_all("1", "Yes") %>% str_replace_all("0", "No")
+
+plot(factor(homeowner) ~ cost, col = plot2Color, xlab = "Quote for customer", ylab = "Homeowner", data = customerGroup)
+```
+For the customers who don't own any houses, they seems to pay more for their insurance.
+
+## Coverage
+```{r}
+coverage <- data[, c(25,16:24)]
+names(coverage)[4:10] <- c("Collision", "Towing", "BI", "PD", "RR", "Comp", "Med/PIP")
+coverage_long <- coverage %>% pivot_longer( 4:10, names_to = "option", values_to = "level")
+```
+
+coverage options A-G vs. cost
+```{r}
+plot1 <- coverage_long %>% group_by(option, level) %>% summarize(mean = mean(cost), number_of_deal = length(option))
+
+ggplot(data = plot1)+
+  geom_point(aes(x = level, y = `mean`, size = `number_of_deal`, color = option))+
+  scale_color_brewer(palette = "Set2")+
+  labs(title = "Coverage Options & Amount vs. Quotes", x = "Quote for customers", y = "Level of Coverage")+
+  facet_wrap(~option, ncol = 3)+
+  theme_bw()
+```
+* From this plot, we can see that the influence of including A, B, E, F seems to be greater.
+
+# Q2
+
+Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE 
+based on the observed variables. Pick two variables of your model, describe their marginal 
+impact on the quote, and comment the interpretation from the business perspective.
 
 
+# Q3
 
+Suppose that a customer will pick the lowest between the quote you provide and that
+ALLSTATE provides. Build a model framework (follow/adapt steps in Model Framework in Class
+3 for the Churn Problem) to maximize expected revenue1 from a customer given the observed 
+characteristics. This includes the mathematical model, description of a decomposition strategy, 
+the associated core tasks, and specific data mining methods you would choose. For each core 
+task comment if it can and if it cannot be implemented with the available data.
 
+# Q4
+Suppose that a customer will pick the lowest between the quote you provide and that
+ALLSTATE provides. Aiming to maximize expected revenue2
+, provide quotes for each of the 
+three customers specified in “new.customers”. Clearly state which core task and which data 
+mining method you used to provide the quote.
 
+# Q5
+Suppose next that the customer might not accept either of the two quotes (but he will consider 
+only the smallest of the quotes). Build a model framework (follow/adapt steps in Model 
+Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer 
+given the observed characteristics. This includes the mathematical model, description of a 
+decomposition strategy, the associated core tasks, and specific data mining methods you would 
+choose. For each core task comment if it can and if it cannot be implemented with the available 
+data.
 
 
 

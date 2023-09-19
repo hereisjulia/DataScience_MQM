@@ -3,7 +3,7 @@
     "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case2/ALLSTATE_RMD.Rmd",
     "project_path": "Case2/ALLSTATE_RMD.Rmd",
     "type": "r_markdown",
-    "hash": "1700372722",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1695095787978.0,
@@ -13,15 +13,16 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "27,50",
-        "scrollLine": "18"
+        "cursorPosition": "93,36",
+        "scrollLine": "79",
+        "docOutlineVisible": "1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1695096598,
+    "lastKnownWriteTime": 1695102274,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1695096598547,
+    "last_content_update": 1695102274854,
     "read_only": false,
     "read_only_alternatives": []
 }
