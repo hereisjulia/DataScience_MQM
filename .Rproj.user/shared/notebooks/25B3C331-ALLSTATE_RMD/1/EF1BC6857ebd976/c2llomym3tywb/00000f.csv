@@ -1,0 +1,5 @@
+"0","model4 <- randomForest(cost~., data=data, nodesize=5, ntree = 500, mtry = 4)
+"
+"2","Error in na.fail.default(list(cost = c(543, 611, 691, 695, 628, 625, 628,  : 
+  missing values in object
+"

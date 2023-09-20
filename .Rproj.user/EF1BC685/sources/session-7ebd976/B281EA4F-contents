@@ -137,9 +137,9 @@ Suppose that a customer will pick the lowest between the quote you provide and t
 ## Regression Model
 ```{r}
 # predict
-Prediction1 <- predict(model1, newdata = new.customers)
+model1pred <- predict(model1, newdata = new.customers)
 
-Predictionq2 <- predict(modelq2, newdata = new.customers)
+modelq2pred <- predict(modelq2, newdata = new.customers)
 
 # Its kinda heard  here, but i think we have to usilize all the functions he set up for us. That will make the mining process easier.
 # And also this should use the methods tought in class 4.... but i'm still not getting it.
@@ -157,24 +157,33 @@ library('sandwich')
 library('party') 
 library('rpart') 
 ```
+
 ```{r}
-model1<-tree(cost~., data = data) 
 model2 <- ctree(cost~., data = data[,-c(2,6)]) 
 model2pred <- predict (model2, newdata = new.customers) 
 model3 <- rpart(cost~., data = data) 
 model3pred <- predict (model3, newdata = new.customers) 
 
-modelq2pred
 model2pred
 model3pred
+
+plot(model3)
+text(model3,label="yval")
+
 ```
 
+## RandomForest
 ```{r}
-modelq2pred
-y <- c(549,627,619)
-R2(y, modelq2pred,"gaussian")
-
+library(randomForest)
+data_nona <- na.omit(data)
+model4 <- randomForest(cost~., data=data_nona, nodesize=5, ntree = 500, mtry = 4)
+model4pred <- predict(model4, newdata = new.customers)
 ```
+
+
+
+
+
 
 
 

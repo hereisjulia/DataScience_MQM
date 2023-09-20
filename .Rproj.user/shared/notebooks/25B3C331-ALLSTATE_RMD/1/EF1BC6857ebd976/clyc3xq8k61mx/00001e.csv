@@ -1,0 +1,6 @@
+"0","text(model3,label=""yval"")
+"
+"2","Warning: argument 'label' is no longer used"
+"2","Error in text.default(xy$x, xy$y + 0.5 * cxy[2L], rows[left.child], ...) : 
+  plot.new has not been called yet
+"
