@@ -1,0 +1,28 @@
+{
+    "id": "B281EA4F",
+    "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case2/ALLSTATE_RMD.Rmd",
+    "project_path": "Case2/ALLSTATE_RMD.Rmd",
+    "type": "r_markdown",
+    "hash": "2834172196",
+    "contents": "",
+    "dirty": false,
+    "created": 1695171926457.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "14,0",
+        "scrollLine": "0",
+        "docOutlineVisible": "1"
+    },
+    "folds": "26|20|33|0|\n37|6|50|0|\n67|23|75|0|\n",
+    "lastKnownWriteTime": 1695236679,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1695240600209,
+    "read_only": false,
+    "read_only_alternatives": []
+}
