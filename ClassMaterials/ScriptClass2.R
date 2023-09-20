@@ -12,7 +12,7 @@ options(warn=0)
 #################################################################
 ### Load infant weight data
 ###
-load("natalityNew.Rda")
+load("./ClassMaterials/natalityNew.Rda")
 ###
 ### This creates a data frame called "d" 
 ### This data set has 198377 observations
@@ -206,7 +206,7 @@ summary( glm( DATA$weight ~ DATA$boy ) )
 ###
 ### Since we are talking about corelations we can visualize things a bit better:
 ### install and load package for displaying correlation matrix
-installpkg("corrplot")
+install.packages("corrplot")
 library(corrplot)
 corrplot(CorMatrix, method = "square")
 corrplot(CorMatrix, method = "ellipse")

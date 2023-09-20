@@ -1,4 +1,0 @@
-"0","data <- read_csv(""https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case2/ALLSTATEcost.csv"")"
-"2","Error in open.connection(3L, ""rb"") : 
-  schannel: failed to receive handshake, SSL/TLS connection failed
-"

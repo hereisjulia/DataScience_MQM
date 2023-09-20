@@ -5,23 +5,23 @@ date: "2023-09-19"
 output: html_document
 ---
 
-```{r for case 2}
+```{r loading packages}
 library(readxl)
 library(readr)
 library(tidyverse)
 library(ggplot2)
 library(stringr)
+source("DataAnalyticsFunctions.R")
 ```
-
-```{r}
-data <- read_csv("E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case2/ALLSTATEcost.csv")
+```{r import data}
+data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case2/ALLSTATEcost.csv")
 summary(data)
 
 names(data)
 drop <- c("customer_ID","shopping_pt","record_type","time","location")
-DATA <- data[,!(names(data) %in% drop)]
+data <- data[,!(names(data) %in% drop)]
 ```
-# Task Description
+# Data Description
 
 To predict competitior's quotes by the given data.
 (Analyze what is their pricing strategy.)
@@ -61,9 +61,7 @@ A,B,C,D,E,F,G - the coverage options:
 # Q1
 Pick two (or more) variables and attempt to show a relation between them via visualization. As discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). 
 
-## customer group
-
-`group_size`, `homeowner`, `car_age`, `car_value`, `risk_factor`, `age_oldest`, `age_youngest`, `married_couple`
+## plot: risk_factor
 
 ```{r}
 library(RColorBrewer)
@@ -71,23 +69,13 @@ plot2Color <- rev(brewer.pal(n = 4, name = "Blues"))
 plot(factor(risk_factor) ~ cost, data = data, col = plot2Color, ylab = "risk_factor")
 ```
 
-
-```{r}
-customerGroup <- data[, c(25, 8:15)]
-customerGroup$homeowner <- customerGroup$homeowner %>% as.character() %>% str_replace_all("1", "Yes") %>% str_replace_all("0", "No")
-
-plot2Color <- brewer.pal(n = 4, name = "Pastel1")
-plot(factor(homeowner) ~ cost, col = plot2Color, xlab = "Quote for customer", ylab = "Homeowner", data = customerGroup)
-```
-For the customers who don't own any houses, they seems to pay more for their insurance.
-
-## Coverage
+## plot: Coverage
 
 coverage options A-G vs. cost
 ```{r}
-coverage <- data[, c(25,16:24)]
-names(coverage)[4:10] <- c("Collision", "Towing", "BI", "PD", "RR", "Comp", "Med/PIP")
-coverage_long <- coverage %>% pivot_longer( 4:10, names_to = "option", values_to = "level")
+coverage <- data[, c(20,13:19)]
+names(coverage)[2:8] <- c("Collision", "Towing", "BI", "PD", "RR", "Comp", "Med/PIP")
+coverage_long <- coverage %>% pivot_longer( 2:8, names_to = "option", values_to = "level")
 
 plot1 <- coverage_long %>% group_by(option, level) %>% summarize(mean = mean(cost), number_of_deal = length(option))
 
@@ -98,126 +86,132 @@ ggplot(data = plot1)+
   facet_wrap(~option, ncol = 3)+
   theme_bw()
 ```
-* From this plot, we can see that the influence of including A, B, E, F seems to be greater.
-
 # Q2
 
 Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
 
 ```{r}
+# load and clean new.customers data. Make it the same data types as the old one.
 new.customers <- readRDS("NewCustomers.Rda")
-new.customers$day <- as.numeric(new.customers$day)
-new.customers$homeowner <- as.numeric(new.customers$homeowner)
-new.customers$risk_factor <- as.numeric(new.customers$risk_factor)
-new.customers$married_couple <- as.numeric(new.customers$married_couple)
-new.customers$C_previous <- as.numeric(new.customers$C_previous)
+new.customers$state <- as.character(new.customers$state)
+new.customers$car_value <- as.character(new.customers$car_value)
 
-str(DATA)
-str(new.customers)
-modelq2 <- glm(cost ~. , data = DATA)
-summary(modelq2)
-modelq2pred <- predict(modelq2, newdata = new.customers)
-1 - (modelq2$dev/modelq2$null)
-```
-
-
-# Q3
-
-Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected revenue1 from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
-
-
-
-# Q4
-Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
-```{r}
-# Regression
-
-source("DataAnalyticsFunctions.R")
-#Error: variables ‘day’, ‘homeowner’, ‘risk_factor’, ‘married_couple’, ‘C_previous’ were specified with different types from the fit
-str(data_cleaned)
-str(new.customers)
-coloumns <- names(new.customers)
+coloumns <- names(new.customers)[c(1,3:5,7:20)]
 for (col_name in coloumns) {
   new.customers[[col_name]] <- as.numeric(new.customers[[col_name]])
 }
 ```
 
+```{r}
+# test the correlation
+library(corrplot)
+testCorr <- data[,-c(2,6)]
+testCorr <- na.omit(testCorr)
+Corr <- cor(testCorr)
+CorrplotColor <- brewer.pal(n = 4, name = "BrBG")
+corrplot(Corr, method = "square", col = rev(CorrplotColor), tl.col = "black")
+```
+
+```{r}
+# model1
+model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = data)
+summary(model1)
+
+# modelq2
+modelq2 <- glm(cost ~. , data = data)
+summary(modelq2)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+```
+
+# Q4
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+
 ## Regression Model
 ```{r}
 # predict
-PredictionQ4 <- predict(modelq2, newdata = new.customers)
-PredictionQ4
-# Its kinda heard  here, but i think we have to usilize all the functions he set up for us. That will make the mining process easier.
-# And also this should use the methods tought in class 4.... but i'm still not getting it.
-
-R2(PredictionQ4, )
+model1pred <- predict(model1, newdata = new.customers)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+model1pred
 ```
-
-
 ## CART
-```{r}
-data_cleaned <- na.omit(DATA)
-drop2 <- c("state", "car_value")
-data_cleaned <- data_cleaned[, !(names(data_cleaned) %in% drop2)]
-
-# 创建决策树模型
-ourtree <- tree(cost ~ homeowner + car_age, data = data_cleaned)
-
-# 打印模型摘要
-summary(ourtree)
-
-# 绘制决策树
-plot(ourtree)
-
-# 在决策树上添加文本标签
-text(ourtree, label = "yval")
-
-
-partition.tree(ourtree, label = "yval", add = FALSE)
-
-predict(ourtree, newdata = new.customers)
-
-```
-```{r}
-summary(modelq2)
-```
-```{r}
+```{r loading packages}
 install.packages("tree") 
 install.packages('rpart') 
 install.packages('party') 
 install.packages('sandwich') 
+library(tree)
 library('sandwich') 
 library('party') 
 library('rpart') 
 ```
-```{r}
 
-model1<-tree(cost~., data = data_cleaned) 
-model2 <- ctree(cost~., data = data_cleaned) 
+```{r}
+model2 <- ctree(cost~., data = data[,-c(2,6)]) 
 model2pred <- predict (model2, newdata = new.customers) 
-model3 <- rpart(cost~., data = data_cleaned) 
+model3 <- rpart(cost~., data = data) 
 model3pred <- predict (model3, newdata = new.customers) 
 
-modelq2pred
 model2pred
 model3pred
 ```
 
-Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+## RandomForest
 ```{r}
-modelq2pred
-y <- c(549,627,619)
-R2(y, modelq2pred,"gaussian")
+library(randomForest)
+data_nona <- na.omit(data)
+model4 <- randomForest(cost~., data=data_nona, nodesize=5, ntree = 500, mtry = 4)
+model4pred <- predict(model4, newdata = new.customers)
 
+model4pred
 ```
 
+## choosing model
 
+```{r}
+training_data <- data_nona[1:as.integer(nrow(data_nona) * 0.8),]
+testing_data <- data_nona[-c(1:as.integer(nrow(data_nona) * 0.8)),]
+```
+
+### Training Model (OOS)
+
+```{r}
+testing_model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = training_data)
+testing_model3 <- rpart(cost~., data = training_data) 
+testing_model4 <- randomForest(cost~., data=training_data, nodesize=5, ntree = 500, mtry = 4)
+```
+Predict Using testing data as newdata
+```{r}
+testPred1 <- predict(testing_model1, newdata = testing_data)
+testPred3 <- predict(testing_model3, newdata = testing_data)
+testPred4 <- predict(testing_model4, newdata = testing_data)
+```
+Compare with actual data
+```{r}
+Test1 <- testing_data %>% mutate(testPredict = testPred1)
+Test3 <- testing_data %>% mutate(testPredict = testPred3)
+Test4 <- testing_data %>% mutate(testPredict = testPred4)
+
+RegressionModel <- R2(Test1$cost, Test1$testPredict, family = "gaussian") # 0.4515599
+CART <- R2(Test3$cost, Test3$testPredict, family = "gaussian") # 0.3683401
+RandomForest <- R2(Test4$cost, Test4$testPredict, family = "gaussian") # 0.368745
+```
+
+plot their R2
+```{r}
+OOS_Perform <- data.frame(Model = c("RegressionModel", "CART", "RandomForest"),
+                          R2 = c(RegressionModel, CART, RandomForest))
+ggplot(OOS_Perform)+
+  geom_col(aes(x = Model, y = R2), fill = "lightsteelblue3")+
+  geom_text(aes(x = Model, y = R2+0.03, label = round(R2,3)))+
+  ylim(0, 0.6)+
+  labs(title = "OOS Performance (R2)")+
+  theme_bw()
+```
+
+### 
 
 # Q5
 Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
-
-
-
 
 
 
