@@ -208,7 +208,52 @@ ggplot(OOS_Perform)+
   theme_bw()
 ```
 
-### 
+### Expected Return
+
+From the previous model choosing conclusion, we are using "model1" (regression model) to predict the cost of ALLSTATE.
+
+for the three customers, set our quote = pred.ALLS.price + x
+
+ourQuote <- model1pred + x
+ExpectReturn <- sum(ourQuote * P_win) # p of customer chooses us
+summary(model1)
+
+Now we have to figure out P_win, which is P of ourQuote < Pred:
+```{r}
+# the prob of actual value > our prediction:
+compare <- data_nona$cost-predict(model1, newdata = data_nona)
+compare <- data.frame(diff = compare)
+compare$diff <- as.numeric(compare$diff)
+compare <- compare %>% mutate(smaller = compare$diff > 0,) %>% cbind(data_nona)
+P_smaller <- sum(compare$smaller)/count(compare) %>% as.numeric()
+P_smaller
+
+# H0: diff > x
+sd <- sd(compare$diff)
+n <- length(compare$diff)
+se <- sd/sqrt(n)
+```
+```{r}
+ERplot <- data.frame(x = seq(-1,-300, by = -1))
+ERplot <- ERplot %>% mutate(tstat = (x-mean(compare$diff))/sd,
+                  P_Win = 1-pnorm(tstat, lower.tail = TRUE),
+                  OurQuote1 = model1pred[1] + x,
+                  OurQuote2 = model1pred[2] + x,
+                  OurQuote3 = model1pred[3] + x)
+ERplot <- ERplot %>% mutate(ExpectReturn = (OurQuote1+OurQuote2+OurQuote3)*P_Win)
+ERplot %>% filter(ExpectReturn == max(ExpectReturn))
+
+ggplot(data = ERplot)+
+  geom_line(aes(x = x, y = ExpectReturn))+
+  geom_text(aes(x = -66, y = 1600, label = "1639.678"))+
+  geom_text(aes(x = -66, y = 0, label = "x= -66"))+
+  theme_bw()
+
+ourQuote <- model1pred -66
+ourQuote
+```
+
+
 
 # Q5
 Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.

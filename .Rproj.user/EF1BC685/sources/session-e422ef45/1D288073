@@ -1,18 +1,18 @@
 {
-    "id": "31F4A45B",
+    "id": "1D288073",
     "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case2/DataAnalyticsFunctions.R",
     "project_path": "Case2/DataAnalyticsFunctions.R",
     "type": "r_source",
-    "hash": "660054924",
+    "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1695182473077.0,
+    "created": 1695230030382.0,
     "source_on_save": false,
-    "relative_order": 3,
+    "relative_order": 4,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "68,34",
+        "cursorPosition": "52,0",
         "scrollLine": "38"
     },
     "folds": "",
