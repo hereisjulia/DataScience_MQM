@@ -107,8 +107,24 @@ for (col_name in coloumns) {
 }
 ```
 
+```{r}
+# test the correlation
+library(corrplot)
+testCorr <- data[,-c(2,6)]
+testCorr <- na.omit(testCorr)
+Corr <- cor(testCorr)
+CorrplotColor <- brewer.pal(n = 4, name = "BrBG")
+corrplot(Corr, method = "square", col = rev(CorrplotColor), tl.col = "black")
+```
+
 
 ```{r}
+# model1
+model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = data)
+summary(model1)
+1 - (model1$dev/model1$null)
+
+# modelq2
 modelq2 <- glm(cost ~. , data = data)
 summary(modelq2)
 modelq2pred <- predict(modelq2, newdata = new.customers)
@@ -121,12 +137,14 @@ Suppose that a customer will pick the lowest between the quote you provide and t
 ## Regression Model
 ```{r}
 # predict
-PredictionQ4 <- predict(modelq2, newdata = new.customers)
-PredictionQ4
+Prediction1 <- predict(model1, newdata = new.customers)
+
+Predictionq2 <- predict(modelq2, newdata = new.customers)
+
 # Its kinda heard  here, but i think we have to usilize all the functions he set up for us. That will make the mining process easier.
 # And also this should use the methods tought in class 4.... but i'm still not getting it.
-
-R2(PredictionQ4, )
+Prediction1
+Predictionq2
 ```
 ## CART
 ```{r}
@@ -141,7 +159,7 @@ library('rpart')
 ```
 ```{r}
 model1<-tree(cost~., data = data) 
-model2 <- ctree(cost~., data = data) 
+model2 <- ctree(cost~., data = data[,-c(2,6)]) 
 model2pred <- predict (model2, newdata = new.customers) 
 model3 <- rpart(cost~., data = data) 
 model3pred <- predict (model3, newdata = new.customers) 
