@@ -109,6 +109,7 @@ resultM5 <- glm(DATA$cost ~ M[,1:5])
 #### on the the coverage options A through G
 #### we can add those interactions in addition to the previous variables
 result_interactions <- glm(cost ~ .+(A+B+C+D+E+F+G)^2, data = DATA) 
+summary(result_interactions)
 #### this has all the variables plus all the interations 
 ####
 ####
@@ -127,6 +128,10 @@ result_interactions <- glm(cost ~ .+(A+B+C+D+E+F+G)^2, data = DATA)
 ## (where NA's in some variables were turned to level "0")
 new.customers <- readRDS("NewCustomers.Rda")
 ##
+str(DATA)
+str(new.customers)
+"group_size","car_age","age_oldest","age_youngest", "duration_previous","A", "B", "C"                
+[16] "D"                 "E"                 "F"                 "G"                 "cost"
 predict (result, newdata = new.customers)
 
 

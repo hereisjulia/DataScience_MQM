@@ -1,0 +1,5 @@
+"0","model2 <- ctree(cost~., data = data) 
+"
+"2","Error in trafo(data = data, numeric_trafo = numeric_trafo, factor_trafo = factor_trafo,  : 
+  data class “character” is not supported
+"

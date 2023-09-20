@@ -1,0 +1,1 @@
+{"frames":[{"func":"R2(PredictionQ4, )","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0},{"func":"deviance(y, pred, family = fam)","file":"DataAnalyticsFunctions.R","line_number":74,"end_line_number":74,"character_number":3,"end_character_number":38}],"message":"Error: object 'PredictionQ4' not found\n"}
