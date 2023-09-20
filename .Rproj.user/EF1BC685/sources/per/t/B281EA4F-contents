@@ -1,0 +1,221 @@
+---
+title: "Case2"
+author: "Julia"
+date: "2023-09-19"
+output: html_document
+---
+
+```{r loading packages}
+library(readxl)
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+source("DataAnalyticsFunctions.R")
+```
+```{r import data}
+data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case2/ALLSTATEcost.csv")
+summary(data)
+
+names(data)
+drop <- c("customer_ID","shopping_pt","record_type","time","location")
+data <- data[,!(names(data) %in% drop)]
+```
+# Data Description
+
+To predict competitior's quotes by the given data.
+(Analyze what is their pricing strategy.)
+
+Target Variable: cost
+
+1. `customer_ID` - A unique identifier for the customer
+2. `shopping_pt` - Unique identifier for the shopping point of a given customer - 地點
+3. `record_type` - 0=shopping point, 1=purchase point
+4. `day` - Day of the week (0-6, 0=Monday)
+5. `time` - Time of day (HH:MM)
+6. `state` - State where shopping point occurred - 地點
+7. `location` - Location ID where shopping point occurred - 地點
+8. `group_size` - How many people will be covered under the policy (1, 2, 3 or 4) - 族群分析
+9. `homeowner` - Whether the customer owns a home or not (0=no, 1=yes)
+10. `car_age` - Age of the customer’s car
+11. `car_value` - How valuable was the customer’s car when new
+12. `risk_factor` - An ordinal assessment of how risky the customer is (1, 2, 3, 4 or NA)
+13. `age_oldest` - Age of the oldest person in customer's group - 族群分析
+14. `age_youngest` - Age of the youngest person in customer’s group - 族群分析
+15. `married_couple` - Does the customer group contain a married couple (0=no, 1=yes) - 族群分析
+16. `C_previous` - What the customer formerly had or currently has for product option C
+(0=nothing, 1, 2, 3,4 or NA)
+17. `duration_previous` - how long (in years) the customer was covered by their previous issuer (duration or NA)
+A,B,C,D,E,F,G - the coverage options: 
+`A` = Collision (levels: 0, 1, 2);              - 碰撞
+`B` = Towing (levels: 0, 1);                    - 拖走（違規停放的車輛）
+`C` = Bodily Injury (BI, levels: 1, 2, 3, 4);   - 身體有受傷 (賠對方)
+`D` = Property Damage (PD, levels 1, 2, 3);     - 物品損害 (賠對方)
+`E` = Rental Reimbursement (RR, levels: 0, 1);  - 租金報銷: 不幸發生車禍意外，汽車送修期間，保險公司會承擔租車的費用。
+`F` = Comprehensive (Comp, levels: 0, 1, 2, 3); - 其他
+`G` = Medical/Personal Injury Protection        - 医疗费用和个人身体伤害保护
+      (Med/PIP, levels: 1, 2, 3, 4)
+25. `cost` - cost of the quoted coverage options (i.e., ALLSTATE’s quote to the customer)
+
+
+# Q1
+Pick two (or more) variables and attempt to show a relation between them via visualization. As discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). 
+
+## plot: risk_factor
+
+```{r}
+library(RColorBrewer)
+plot2Color <- rev(brewer.pal(n = 4, name = "Blues"))
+plot(factor(risk_factor) ~ cost, data = data, col = plot2Color, ylab = "risk_factor")
+```
+
+## plot: Coverage
+
+coverage options A-G vs. cost
+```{r}
+coverage <- data[, c(20,13:19)]
+names(coverage)[2:8] <- c("Collision", "Towing", "BI", "PD", "RR", "Comp", "Med/PIP")
+coverage_long <- coverage %>% pivot_longer( 2:8, names_to = "option", values_to = "level")
+
+plot1 <- coverage_long %>% group_by(option, level) %>% summarize(mean = mean(cost), number_of_deal = length(option))
+
+ggplot(data = plot1)+
+  geom_point(aes(x = level, y = `mean`, size = `number_of_deal`, color = option))+
+  scale_color_brewer(palette = "Set2")+
+  labs(title = "Coverage Options & Amount vs. Quotes", x = "level of Coverage", y = "Quote for customers")+
+  facet_wrap(~option, ncol = 3)+
+  theme_bw()
+```
+# Q2
+
+Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
+
+```{r}
+# load and clean new.customers data. Make it the same data types as the old one.
+new.customers <- readRDS("NewCustomers.Rda")
+new.customers$state <- as.character(new.customers$state)
+new.customers$car_value <- as.character(new.customers$car_value)
+
+coloumns <- names(new.customers)[c(1,3:5,7:20)]
+for (col_name in coloumns) {
+  new.customers[[col_name]] <- as.numeric(new.customers[[col_name]])
+}
+```
+
+```{r}
+# test the correlation
+library(corrplot)
+testCorr <- data[,-c(2,6)]
+testCorr <- na.omit(testCorr)
+Corr <- cor(testCorr)
+CorrplotColor <- brewer.pal(n = 4, name = "BrBG")
+corrplot(Corr, method = "square", col = rev(CorrplotColor), tl.col = "black")
+```
+
+```{r}
+# model1
+model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = data)
+summary(model1)
+
+# modelq2
+modelq2 <- glm(cost ~. , data = data)
+summary(modelq2)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+```
+
+# Q4
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+
+## Regression Model
+```{r}
+# predict
+model1pred <- predict(model1, newdata = new.customers)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+model1pred
+```
+## CART
+```{r loading packages}
+install.packages("tree") 
+install.packages('rpart') 
+install.packages('party') 
+install.packages('sandwich') 
+library(tree)
+library('sandwich') 
+library('party') 
+library('rpart') 
+```
+
+```{r}
+model2 <- ctree(cost~., data = data[,-c(2,6)]) 
+model2pred <- predict (model2, newdata = new.customers) 
+model3 <- rpart(cost~., data = data) 
+model3pred <- predict (model3, newdata = new.customers) 
+
+model2pred
+model3pred
+```
+
+## RandomForest
+```{r}
+library(randomForest)
+data_nona <- na.omit(data)
+model4 <- randomForest(cost~., data=data_nona, nodesize=5, ntree = 500, mtry = 4)
+model4pred <- predict(model4, newdata = new.customers)
+
+model4pred
+```
+
+## choosing model
+
+```{r}
+training_data <- data_nona[1:as.integer(nrow(data_nona) * 0.8),]
+testing_data <- data_nona[-c(1:as.integer(nrow(data_nona) * 0.8)),]
+```
+
+### Training Model (OOS)
+
+```{r}
+testing_model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = training_data)
+testing_model3 <- rpart(cost~., data = training_data) 
+testing_model4 <- randomForest(cost~., data=training_data, nodesize=5, ntree = 500, mtry = 4)
+```
+Predict Using testing data as newdata
+```{r}
+testPred1 <- predict(testing_model1, newdata = testing_data)
+testPred3 <- predict(testing_model3, newdata = testing_data)
+testPred4 <- predict(testing_model4, newdata = testing_data)
+```
+Compare with actual data
+```{r}
+Test1 <- testing_data %>% mutate(testPredict = testPred1)
+Test3 <- testing_data %>% mutate(testPredict = testPred3)
+Test4 <- testing_data %>% mutate(testPredict = testPred4)
+
+RegressionModel <- R2(Test1$cost, Test1$testPredict, family = "gaussian") # 0.4515599
+CART <- R2(Test3$cost, Test3$testPredict, family = "gaussian") # 0.3683401
+RandomForest <- R2(Test4$cost, Test4$testPredict, family = "gaussian") # 0.368745
+```
+
+plot their R2
+```{r}
+OOS_Perform <- data.frame(Model = c("RegressionModel", "CART", "RandomForest"),
+                          R2 = c(RegressionModel, CART, RandomForest))
+ggplot(OOS_Perform)+
+  geom_col(aes(x = Model, y = R2), fill = "lightsteelblue3")+
+  geom_text(aes(x = Model, y = R2+0.03, label = round(R2,3)))+
+  ylim(0, 0.6)+
+  labs(title = "OOS Performance (R2)")+
+  theme_bw()
+```
+
+### 
+
+# Q5
+Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
+
+
+
+
+
+
+
