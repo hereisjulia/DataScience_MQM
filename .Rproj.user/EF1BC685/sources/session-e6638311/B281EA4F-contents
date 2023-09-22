@@ -1,0 +1,234 @@
+---
+title: "Case2"
+author: "Julia"
+date: "2023-09-19"
+output: html_document
+---
+
+```{r loading packages}
+library(readxl)
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+source("DataAnalyticsFunctions.R")
+```
+```{r import data}
+data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case2/ALLSTATEcost.csv")
+summary(data)
+
+names(data)
+drop <- c("customer_ID","shopping_pt","record_type","time","location")
+data <- data[,!(names(data) %in% drop)]
+```
+# Q1
+Pick two (or more) variables and attempt to show a relation between them via visualization. As discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). 
+
+## plot: risk_factor
+
+```{r}
+library(RColorBrewer)
+plot2Color <- rev(brewer.pal(n = 4, name = "Blues"))
+plot(factor(risk_factor) ~ cost, data = data, col = plot2Color, ylab = "risk_factor")
+```
+
+## plot: Coverage
+
+coverage options A-G vs. cost
+```{r}
+coverage <- data[, c(20,13:19)]
+names(coverage)[2:8] <- c("Collision", "Towing", "BI", "PD", "RR", "Comp", "Med/PIP")
+coverage_long <- coverage %>% pivot_longer( 2:8, names_to = "option", values_to = "level")
+
+plot1 <- coverage_long %>% group_by(option, level) %>% summarize(mean = mean(cost), number_of_deal = length(option))
+
+ggplot(data = plot1)+
+  geom_point(aes(x = level, y = `mean`, size = `number_of_deal`, color = option))+
+  scale_color_brewer(palette = "Set2")+
+  labs(title = "Coverage Options & Amount vs. Quotes", x = "level of Coverage", y = "Quote for customers")+
+  facet_wrap(~option, ncol = 3)+
+  theme_bw()
+```
+# Q2
+
+Provide a model based on linear regression to forecast the quoting procedure from ALLSTATE based on the observed variables. Pick two variables of your model, describe their marginal impact on the quote, and comment the interpretation from the business perspective.
+
+```{r load new.customers}
+# load and clean new.customers data. Make it the same data types as the old one.
+new.customers <- readRDS("NewCustomers.Rda")
+new.customers$state <- as.character(new.customers$state)
+new.customers$car_value <- as.character(new.customers$car_value)
+
+coloumns <- names(new.customers)[c(1,3:5,7:20)]
+for (col_name in coloumns) {
+  new.customers[[col_name]] <- as.numeric(new.customers[[col_name]])
+}
+```
+
+```{r test correlation}
+# test the correlation
+library(corrplot)
+testCorr <- data[,-c(2,6)]
+testCorr <- na.omit(testCorr)
+Corr <- cor(testCorr)
+CorrplotColor <- brewer.pal(n = 4, name = "BrBG")
+corrplot(Corr, method = "square", col = rev(CorrplotColor), tl.col = "black")
+```
+
+```{r}
+# model1
+model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = data)
+summary(model1)
+
+# modelq2
+modelq2 <- glm(cost ~. , data = data)
+summary(modelq2)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+```
+
+# Q4
+Suppose that a customer will pick the lowest between the quote you provide and that ALLSTATE provides. Aiming to maximize expected revenue2, provide quotes for each of the three customers specified in “new.customers”. Clearly state which core task and which data mining method you used to provide the quote.
+
+## Regression Model
+```{r}
+# predict
+model1pred <- predict(model1, newdata = new.customers)
+modelq2pred <- predict(modelq2, newdata = new.customers)
+model1pred
+```
+## CART
+```{r loading packages}
+install.packages("tree") 
+install.packages('rpart') 
+install.packages('party') 
+install.packages('sandwich') 
+library(tree)
+library('sandwich') 
+library('party') 
+library('rpart') 
+```
+
+```{r}
+model2 <- ctree(cost~., data = data[,-c(2,6)]) 
+model2pred <- predict (model2, newdata = new.customers) 
+model3 <- rpart(cost~., data = data) 
+model3pred <- predict (model3, newdata = new.customers) 
+
+model2pred
+model3pred
+```
+
+## RandomForest
+```{r}
+library(randomForest)
+data_nona <- na.omit(data)
+model4 <- randomForest(cost~., data=data_nona, nodesize=5, ntree = 500, mtry = 4)
+model4pred <- predict(model4, newdata = new.customers)
+
+model4pred
+```
+
+## choosing model
+
+```{r}
+training_data <- data_nona[1:as.integer(nrow(data_nona) * 0.8),]
+testing_data <- data_nona[-c(1:as.integer(nrow(data_nona) * 0.8)),]
+```
+
+### Training Model (OOS)
+
+```{r}
+testing_model1 <- glm(cost ~.+(A+B+C+D+E+F+G)^2, data = training_data)
+testing_model2 <- ctree(cost~., data = training_data[,-c(2,6)])
+testing_model3 <- rpart(cost~., data = training_data)
+testing_model4 <- randomForest(cost~., data=training_data, nodesize=5, ntree = 500, mtry = 4)
+```
+Predict Using testing data as newdata
+```{r}
+testPred1 <- predict(testing_model1, newdata = testing_data)
+testPred2 <- predict(testing_model2, newdata = testing_data)
+testPred3 <- predict(testing_model3, newdata = testing_data)
+testPred4 <- predict(testing_model4, newdata = testing_data)
+```
+Compare with actual data
+```{r}
+Test1 <- testing_data %>% mutate(testPredict = testPred1)
+Test2 <- testing_data %>% mutate(testPredict = testPred2)
+Test3 <- testing_data %>% mutate(testPredict = testPred3)
+Test4 <- testing_data %>% mutate(testPredict = testPred4)
+
+RegressionModel <- R2(Test1$cost, Test1$testPredict, family = "gaussian") # 0.4515599
+CART_ctree <- R2(Test2$cost, Test2$testPredict, family = "gaussian") # 0.207664
+CART_rpart <- R2(Test3$cost, Test3$testPredict, family = "gaussian") # 0.3683401
+RandomForest <- R2(Test4$cost, Test4$testPredict, family = "gaussian") # 0.368745
+```
+
+plot their R2
+```{r}
+OOS_Perform <- data.frame(Model = c("RegressionModel", "CART_ctree", "CART_rpart", "RandomForest"),
+                          R2 = c(RegressionModel, CART_ctree, CART_rpart, RandomForest))
+ggplot(OOS_Perform)+
+  geom_col(aes(x = Model, y = R2), fill = "lightsteelblue3")+
+  geom_text(aes(x = Model, y = R2+0.03, label = round(R2,3)))+
+  ylim(0, 0.6)+
+  labs(title = "OOS Performance (R2)")+
+  theme_bw()
+```
+
+### Expected Return
+
+From the previous model choosing conclusion, we are using "model1" (regression model) to predict the cost of ALLSTATE.
+
+for the three customers, set our quote = pred.ALLS.price + x
+
+ourQuote <- model1pred + x
+ExpectReturn <- sum(ourQuote * P_win) # p of customer chooses us
+summary(model1)
+
+Now we have to figure out P_win, which is P of ourQuote < Pred:
+```{r}
+# the prob of actual value > our prediction:
+compare <- data_nona$cost-predict(model1, newdata = data_nona)
+compare <- data.frame(diff = compare)
+compare$diff <- as.numeric(compare$diff)
+compare <- compare %>% mutate(smaller = compare$diff > 0,) %>% cbind(data_nona)
+P_smaller <- sum(compare$smaller)/count(compare) %>% as.numeric()
+P_smaller
+
+# H0: diff > x
+sd <- sd(compare$diff)
+n <- length(compare$diff)
+se <- sd/sqrt(n)
+```
+```{r}
+ERplot <- data.frame(x = seq(-1,-300, by = -1))
+ERplot <- ERplot %>% mutate(tstat = (x-mean(compare$diff))/sd,
+                  P_Win = 1-pnorm(tstat, lower.tail = TRUE),
+                  OurQuote1 = model1pred[1] + x,
+                  OurQuote2 = model1pred[2] + x,
+                  OurQuote3 = model1pred[3] + x)
+ERplot <- ERplot %>% mutate(ExpectReturn = (OurQuote1+OurQuote2+OurQuote3)*P_Win)
+ERplot %>% filter(ExpectReturn == max(ExpectReturn))
+
+ggplot(data = ERplot)+
+  geom_line(aes(x = x, y = ExpectReturn))+
+  geom_text(aes(x = -66, y = 1600, label = "1639.678"))+
+  geom_text(aes(x = -66, y = 500, label = "x= -66"))+
+  ylim(500,2000)+
+  theme_bw()
+
+ourQuote <- model1pred -66
+ourQuote
+```
+
+
+
+# Q5
+Suppose next that the customer might not accept either of the two quotes (but he will consider only the smallest of the quotes). Build a model framework (follow/adapt steps in Model Framework in Class 3 for the Churn Problem) to maximize expected profit from a customer given the observed characteristics. This includes the mathematical model, description of a decomposition strategy, the associated core tasks, and specific data mining methods you would choose. For each core task comment if it can and if it cannot be implemented with the available data.
+
+
+
+
+
+
+

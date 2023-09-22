@@ -1,0 +1,38 @@
+---
+title: "Class5"
+author: "Julia"
+date: "2023-09-21"
+output: html_document
+---
+
+# Allstate
+```{r}
+data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case2/ALLSTATEcost.csv")
+drop <- c("customer_ID","shopping_pt","record_type","time","location")
+data <- data[, !names(data) %in% drop]
+```
+
+```{r}
+ggplot(data = data)+
+  geom_jitter(aes(x = car_value, y = cost, color = car_age))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
