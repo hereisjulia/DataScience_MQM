@@ -61,6 +61,20 @@ View(election_data_train)
 ### we will work with election_data_train$Obama_margin_percent to be the target out models.
 ###
 
+## target variable: Obama_margin_percent
+
+summary(election_data_train)
+names(election_data_train)
+## let's try: AgeBelow35, Age35to65, Age65andAbove, MedianIncome
+ggplot(data= election_data_train)+
+  geom_point(aes(x=MedianIncome, y=Obama_margin_percent))+
+  geom_abline(intercept = 0, slope = 0, color = "red")
+
+plot1data <- election_data_train %>% group_by(Region) %>% summarize(sum(Obama_wins)/(Count = n()))
+names(plot1data)[2] <- "percent"
+ggplot(data = plot1data)+
+  geom_col(aes(x = Region, y = percent))
+
 ###
 ### Question 1: Provide a visualization (very flexible format, 
 ### it does not need to be related to the election)
@@ -71,8 +85,45 @@ View(election_data_train)
 ### provided above. (Hint: FIPS variable bahaves as an identifier for each observation
 ### so you might not want to include it in a linear regression.)
 ###
+trainIndex1 <- createDataPartition(election_data_train$Obama_margin_percent, p = 0.8, list = FALSE)
+train1 <- election_data_train[trainIndex1, ] #80%
+test1 <- election_data_train[-trainIndex1, ] #20%
 
-###
+names(train1)
+### Linear Model
+drop <- c("County","State", "ElectionDate","ElectionType","Obama_margin","Obama_wins", "TotalVote", "Clinton", "Obama")
+train1 <- train1[,!names(train1) %in% drop]
+linearModel <- glm(Obama_margin_percent ~., data = train1)
+summary(linearModel)
+LM_pred <- as.numeric(predict(linearModel, newdata = test1))
+LM_perform <- cbind(test1, LM_pred) %>% mutate(LMdiff = LM_pred-Obama_margin_percent)
+View(LM_perform)
+
+### CART
+library(party)
+region_mapping <- c("Northeast"=1, "Midwest" =2, "West" =3, "South" = 4 )
+train1$Region <- as.integer(factor(train1$Region, levels = names(region_mapping)))
+test1$Region <- as.integer(factor(test1$Region, levels = names(region_mapping)))
+
+
+tree <- ctree(Obama_margin_percent ~., data = train1) 
+tree_pred <- predict(tree, newdata = test1)
+tree_perform <- cbind(test1, tree_pred) 
+names(tree_perform)[45] <- "tree_pred"
+tree_perform <- tree_perform %>% mutate(Treediff = tree_pred - Obama_margin_percent)
+
+### Random Forest
+
+
+
+
+ggplot()+
+  geom_abline(slope = 0, intercept = 0, color = "red", size = 2)+
+  geom_point(data = LM_perform, aes(x = Obama_margin_percent, y = LMdiff))+
+  geom_point(data = tree_perform, aes(x = Obama_margin_percent, y = Treediff), color = "blue")
+
+
+
 ### Question 3: Keep in mind that unsupervised learning 
 ### is used to explore the data. Feel free to consider only a subset of the 
 ### demographic variables. 

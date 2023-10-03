@@ -1,0 +1,77 @@
+---
+title: "Case3"
+author: "Julia"
+date: "2023-10-03"
+output: html_document
+---
+
+```{r packages}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+```
+
+```{r}
+election_data <- read_csv("./Case3/ElectionDataAlone.csv")
+View(election_data)
+```
+
+1. Pick two (or more) variables and attempt to show a relation between them via visualization. As  discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). (Note that in this question it is not required that the relationship displayed relates to the election.)
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+2. Provide a model to predict the winning spread of Obama over Clinton measured as percentage of the total vote. Describe clearly the core task, briefly discuss all the models you compared, state which metric is being used to evaluate performance, and how did you chose a final model. Apply and report a K-fold cross validation to evaluate the performance of your chosen model. Based on your final model, predict the winning spread percentages for the test sample (provide the R code that generate your predictions). 
+
+
+
+
+
+
+
+
+3. (Optional Question) In order to explore the data, apply one unsupervised learning tool (e.g., kmeans, principal component analysis), interpret and communicate briefly the output (e.g., clusters, latent features), and attempt to obtain insights. 
+
+
+4. (Optional Question) Several sources have been reporting that the demographic composition of the US is changing which can definitely impact how campaigns will be run. In many states, the Hispanic population is growing at a faster pace than others. Looking ahead, provide an estimate for what would have been the average impact on the winning spread for Obama over Clinton (measured in percentage of total voters) had the Hispanic demographic been 5% larger? What if the Black demographic was 5% larger? (Base your response only on the two simple regression models provided in the R file.)
+Next, answer the question being careful to isolate the impact of the specific demographic change alone. (This question would be too open ended. In the R starter script we provide a “simple”model with 1771 variables to be used for which we will assume that the Conditional Independence Assumption (CIA) holds.)
+
+
+5. (Optional Question) Choose one candidate. What kind of advice (based on data analytics) would 
+you provide to your candidate? For example, which voter segment to target with their campaign 
+messages and why? Or, how to allocate resources (budget and volunteer time) across regions 
+and why? How would you communicate such insights?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
