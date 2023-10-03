@@ -1,0 +1,27 @@
+{
+    "id": "9EF622BE",
+    "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/TermProject/cleaning.Rmd",
+    "project_path": "TermProject/cleaning.Rmd",
+    "type": "r_markdown",
+    "hash": "1431422283",
+    "contents": "",
+    "dirty": false,
+    "created": 1695735856517.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "91,16",
+        "scrollLine": "84"
+    },
+    "folds": "25|11|28|0|\n29|11|32|0|\n34|6|43|0|\n44|11|49|0|\n54|11|74|0|\n",
+    "lastKnownWriteTime": 1696359361,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1696359361486,
+    "read_only": false,
+    "read_only_alternatives": []
+}
