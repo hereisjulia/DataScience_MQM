@@ -13,11 +13,17 @@ library(stringr)
 ```
 
 ```{r}
-Election <- read_csv("./Case3/ElectionDataAlone.csv")
-View(Election)
+election_data <- read_csv("./Case3/ElectionDataAlone.csv")
+View(election_data)
 ```
 
 1. Pick two (or more) variables and attempt to show a relation between them via visualization. As  discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). (Note that in this question it is not required that the relationship displayed relates to the election.)
+```{r}
+
+
+
+
+```
 
 
 
