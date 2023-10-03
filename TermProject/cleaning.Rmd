@@ -34,20 +34,24 @@ ggplot(data=data)+
 ```
 
 ```{r}
-testCorr$HasMortgage <- ifelse(testCorr$HasMortgage == "Yes", 1, 0)
-testCorr$HasDependents <- ifelse(testCorr$HasDependents == "Yes", 1, 0)
-testCorr$HasCoSigner <- ifelse(testCorr$HasDependents == "Yes", 1, 0)
 
-testCorr
 ```
 
 
 
 ```{r}
+library(RColorBrewer)
 library(corrplot)
-testCorr <- data[,-1]
-testCorr <- na.omit(testCorr)
+testCorr <- data[,-c(1)]#, 11, 12, 13, 15, 18)]
+testCorr$HasMortgage <- ifelse(testCorr$HasMortgage == "Yes", 1, 0)
+testCorr$HasDependents <- ifelse(testCorr$HasDependents == "Yes", 1, 0)
+testCorr$HasCoSigner <- ifelse(testCorr$HasCoSigner == "Yes", 1, 0)
+testCorr <- testCorr[, -c(10,11,12,15)]
+str(testCorr)
+testCorr$HasCoSigner
+
 Corr <- cor(testCorr)
+Corr
 CorrplotColor <- brewer.pal(n = 4, name = "BrBG")
 corrplot(Corr, method = "square", col = rev(CorrplotColor), tl.col = "black")
 ```

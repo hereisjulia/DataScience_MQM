@@ -1,4 +1,0 @@
-"0","Corr <- cor(testCorr)
-"
-"2","Error in cor(testCorr) : 'x' must be numeric
-"

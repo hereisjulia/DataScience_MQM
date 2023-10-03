@@ -1,0 +1,10 @@
+"0","heatmap(Corr, 
+        col = brewer.pal(n = 100, name = ""BrBG""),  # 颜色范围
+        main = ""Heatmap Example"",  # 主标题
+        xlab = ""Columns"",  # X轴标签
+        ylab = ""Rows""  # Y轴标签
+)
+"
+"2","Warning: n too large, allowed maximum for palette BrBG is 11
+Returning the palette you asked for with that many colors
+"
