@@ -63,22 +63,46 @@ View(election_data_train)
 
 ## target variable: Obama_margin_percent
 
-summary(election_data_train)
-names(election_data_train)
-## let's try: AgeBelow35, Age35to65, Age65andAbove, MedianIncome
-ggplot(data= election_data_train)+
-  geom_point(aes(x=MedianIncome, y=Obama_margin_percent))+
-  geom_abline(intercept = 0, slope = 0, color = "red")
-
-plot1data <- election_data_train %>% group_by(Region) %>% summarize(sum(Obama_wins)/(Count = n()))
-names(plot1data)[2] <- "percent"
-ggplot(data = plot1data)+
-  geom_col(aes(x = Region, y = percent))
+#####Correlation Heatmap #####
+library(RColorBrewer)
+library(corrplot)
+names(corrPlot)
+corrDrop <- c("County","State","Region", "ElectionDate","ElectionType", "FIPS","Obama","Obama_wins")
+corrPlot <- election_data_train[,!names(election_data_train) %in% corrDrop]
+str(corrPlot)
+Corr <- cor(corrPlot)
+Corr
+CorrplotColor <- brewer.pal(n = 8, name = "BrBG")
+corrplot(Corr, method = "color",col = CorrplotColor, tl.col = "black")
+library(ggplot2) 
+library(maps) 
+#####
 
 ###
 ### Question 1: Provide a visualization (very flexible format, 
 ### it does not need to be related to the election)
 ### 
+
+##plot1
+us_map <- map_data("state") 
+state_abbr_mapping <- data.frame(
+  State = tolower(c("Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")),
+  Abbreviation = c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+)
+us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+state_map <- merge(us_map, election_data_train, by.x = "State", by.y = "State", all.x = TRUE)
+ggplot(state_map)+
+  geom_map(aes(fill = Obama_margin_percent, x =  long, y = lat, map_id = region), map = us_map, colour="white", size = 0.5)+
+  labs(title = "Obama's Margin in States", fill = "Margin(%)") +
+  theme_void()
+
+##plot2
+a<-election_data_train %>% group_by(Region) %>% summarize(ObamaVotes = mean(Obama/TotalVote)*100, PovertyRate = mean(Poverty))%>%
+  pivot_longer(-c(1), names_to = "type", values_to = "Percent" )
+ggplot(data = a)+
+  geom_col(aes(x = Region, y = Percent, fill = type), position = position_dodge(width = 0.8))+
+  geom_text(aes(x = Region, y = Percent, label = round(Percent,2)))+
+  labs(title = "Votes for Obama (%) vs Poverty Rate (%)")
 
 ###
 ### Question 2: Prediction. No additional script beyond the cleaning up the data
@@ -151,6 +175,9 @@ summary(BlackSimple)
 y <- election_data_train$Obama_margin_percent
 x <- model.matrix( Obama_margin_percent ~ .-Hispanic-Obama_wins-Obama_margin-FIPS-ElectionDate-TotalVote-Clinton-Obama, data = election_data_train )
 d <- election_data_train$Hispanic
+
+CausalLinear(y,d,x)
+
 
 #### Model with 1771 controls to measure the impact of 1% larger Black demographic
 y <- election_data_train$Obama_margin_percent

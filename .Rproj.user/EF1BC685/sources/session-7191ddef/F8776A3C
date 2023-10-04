@@ -3,7 +3,7 @@
     "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case3/ObamaClintonToPost.R",
     "project_path": "Case3/ObamaClintonToPost.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "1723783316",
     "contents": "",
     "dirty": false,
     "created": 1696357181228.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "125,0",
-        "scrollLine": "102"
+        "cursorPosition": "160,23",
+        "scrollLine": "152"
     },
-    "folds": "",
-    "lastKnownWriteTime": 1696365547,
+    "folds": "65|25|77|14|\n",
+    "lastKnownWriteTime": 1696463987,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1696365547331,
+    "last_content_update": 1696463987335,
     "read_only": false,
     "read_only_alternatives": []
 }
