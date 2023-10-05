@@ -100,7 +100,7 @@ ggplot(state_map)+
 a<-election_data_train %>% group_by(Region) %>% summarize(ObamaVotes = mean(Obama/TotalVote)*100, PovertyRate = mean(Poverty))%>%
   pivot_longer(-c(1), names_to = "type", values_to = "Percent" )
 ggplot(data = a)+
-  geom_col(aes(x = Region, y = Percent, fill = type), position = position_dodge(width = 0.8))+
+  geom_col(aes(x = Region, y = Percent, fill = type), position = position_dodge())+
   geom_text(aes(x = Region, y = Percent, label = round(Percent,2)))+
   labs(title = "Votes for Obama (%) vs Poverty Rate (%)")
 
