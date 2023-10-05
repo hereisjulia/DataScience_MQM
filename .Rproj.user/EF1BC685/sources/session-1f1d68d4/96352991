@@ -1,0 +1,28 @@
+{
+    "id": "96352991",
+    "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case3/case3.Rmd",
+    "project_path": "Case3/case3.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1696537007836.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "105,60",
+        "scrollLine": "21",
+        "docOutlineVisible": "1"
+    },
+    "folds": "7|15|18|0|\n20|19|48|0|\n51|12|64|0|\n66|12|74|0|\n78|19|90|0|\n",
+    "lastKnownWriteTime": 1696540494,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1696540494272,
+    "read_only": false,
+    "read_only_alternatives": []
+}

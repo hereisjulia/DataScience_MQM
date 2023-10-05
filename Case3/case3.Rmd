@@ -10,30 +10,140 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 library(stringr)
+library(caret)
+library(glmnet)
+library(randomForest)
+library(dplyr)
+library(cluster)
+library(party)
 ```
 
-```{r}
+```{r data prepare}
 election_data <- read_csv("./Case3/ElectionDataAlone.csv")
-View(election_data)
-```
+impute_data <- function(vec, mn) {
+  ifelse(is.na(vec), mn, vec)
+}
+data_mean <- sapply(election_data[,10:41],mean, na.rm=TRUE)
+(data_mean)
+for(i in 10:41) {
+  election_data[,i]<-impute_data(election_data[,i],data_mean[i-9])
+}
+summary(election_data)
 
+#Factor conversion
+election_data$County <- as.factor(election_data$County)
+election_data$State <- as.factor(election_data$State)
+election_data$FIPS <- as.factor(election_data$FIPS)
+election_data$Region <- as.factor(election_data$Region)
+election_data$ElectionType <- as.factor(election_data$ElectionType)
+
+#Split the original file
+election_data$ElectionDate <- as.Date(election_data$ElectionDate, format="%m/%d/%Y")
+election_data_train <- election_data[election_data$ElectionDate < as.Date("2/19/2008", format="%m/%d/%Y"), ]
+election_data_test <- election_data[election_data$ElectionDate >= as.Date("2/19/2008", format="%m/%d/%Y"), ]
+
+#Add margins
+election_data_train$Obama_margin <- election_data_train$Obama - election_data_train$Clinton
+election_data_train$Obama_margin_percent <- 100*election_data_train$Obama_margin/election_data_train$TotalVote
+election_data_train$Obama_wins <- ifelse(election_data_train$Obama_margin >0, 1,0)
+```
+# Q1
 1. Pick two (or more) variables and attempt to show a relation between them via visualization. As  discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). (Note that in this question it is not required that the relationship displayed relates to the election.)
-```{r}
-
-
-
-
+```{r plot1}
+##plot1
+us_map <- map_data("state") 
+state_abbr_mapping <- data.frame(
+  State = tolower(c("Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")),
+  Abbreviation = c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+)
+us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+state_map <- merge(us_map, election_data_train, by.x = "State", by.y = "State", all.x = TRUE)
+ggplot(state_map)+
+  geom_map(aes(fill = Obama_margin_percent, x =  long, y = lat, map_id = region), map = us_map, colour="white", size = 0.5)+
+  labs(title = "Obama's Margin in States", fill = "Margin(%)") +
+  theme_void()
 ```
 
+```{r plot2}
+##plot2
+a<-election_data_train %>% group_by(Region) %>% summarize(ObamaVotes = mean(Obama/TotalVote)*100, PovertyRate = mean(Poverty))%>%
+  pivot_longer(-c(1), names_to = "type", values_to = "Percent" )
+ggplot(data = a)+
+  geom_col(aes(x = Region, y = Percent, fill = type), position = position_dodge(width = 0.8))+
+  geom_text(aes(x = Region, y = Percent, label = round(Percent,2)))+
+  labs(title = "Votes for Obama (%) vs Poverty Rate (%)")
+```
 
-
-
-
-
-
+# Q2
 2. Provide a model to predict the winning spread of Obama over Clinton measured as percentage of the total vote. Describe clearly the core task, briefly discuss all the models you compared, state which metric is being used to evaluate performance, and how did you chose a final model. Apply and report a K-fold cross validation to evaluate the performance of your chosen model. Based on your final model, predict the winning spread percentages for the test sample (provide the R code that generate your predictions). 
+```{r data prepare}
+#Split the training data for OOS
+set.seed(123456) 
+train_indices <- sample(1:nrow(election_data_train), 0.8 * nrow(election_data_train))
+train_data_OOS <- election_data_train[train_indices, ]
+test_data_OOS <- election_data_train[-train_indices, ]  
 
+#Column deletion
+drop1 <- c("County", "State", "Region", "FIPS")
+drop2 <- c("County","State", "ElectionDate","ElectionType","Obama_margin","Obama_wins", "TotalVote", "Clinton", "Obama")
+test_data <- test_data_OOS[,!names(test_data_OOS) %in% drop1]
+train_data <- train_data_OOS[,!names(train_data_OOS) %in% drop1]
+```
 
+## build models
+```{r}
+#LinearModel
+linearModel <- glm(Obama_margin_percent ~., data = train_data)
+summary(linearModel)
+LM_inSample <- as.numeric(predict(linearModel, newdata = train_data))
+LM_pred <- as.numeric(predict(linearModel, newdata = test_data))
+LM_perform <- cbind(test_data, LM_pred) %>% mutate(LMdiff = LM_pred-Obama_margin_percent)
+```
+
+```{r}
+#CART
+train_data$ElectionDate <- as.numeric(train_data$ElectionDate)
+test_data$ElectionDate <- as.numeric(test_data$ElectionDate)
+
+tree <- ctree(Obama_margin_percent ~., data = train_data) 
+tree_inSample <- predict(tree, newdata = train_data)
+tree_pred <- predict(tree, newdata = test_data)
+tree_perform <- cbind(test_data, tree_pred) 
+names(tree_perform)[41] <- "tree_pred"
+tree_perform <- tree_perform %>% mutate(Treediff = tree_pred - Obama_margin_percent)
+```
+
+```{r}
+#RandomForest
+train_data <- train_data_OOS[,!names(train_data_OOS) %in% drop1]
+test_data <- test_data_OOS[,!names(test_data_OOS) %in% drop1]
+randomForest <- randomForest(Obama_margin_percent ~ ., data = train_data, ntree = 100, mtry = 8, importance = TRUE)
+randomForest_inSample <- predict(randomForest, newdata = train_data)
+randomForest_pred <- predict(randomForest, newdata = test_data)
+randomForest_perform <- cbind(test_data, randomForest_pred)
+randomForest_perform <- randomForest_perform %>% mutate(randomForestdiff = randomForest_pred - Obama_margin_percent)
+```
+
+So, above are the 3 models. We are now going to evaluate and find the best model.
+
+## Evaluation
+
+```{r}
+R2_matrix <- data.frame(
+  "Model" = c("Linear_Model", "CART", "Random_Forest"),
+  "inSample_R2" = c(
+    R2(train_data$Obama_margin_percent, LM_inSample, family = "gaussian"),
+    R2(train_data$Obama_margin_percent, tree_inSample, family = "gaussian"),
+    R2(train_data$Obama_margin_percent, randomForest_inSample, family = "gaussian")
+  ),
+  "OOS_R2" = c(
+    R2(LM_perform$Obama_margin_percent, LM_perform$LM_pred, family = "gaussian"),
+    R2(tree_perform$Obama_margin_percent, tree_perform$tree_pred, family = "gaussian"),
+    R2(randomForest_perform$Obama_margin_percent, randomForest_perform$randomForest_pred, family = "gaussian")
+))
+R2_matrix
+```
+Base on their R2 outcomes, we decided to choose Random Forest as our final model.
 
 
 

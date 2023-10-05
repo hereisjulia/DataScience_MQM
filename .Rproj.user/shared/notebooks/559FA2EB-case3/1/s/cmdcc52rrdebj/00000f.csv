@@ -1,0 +1,10 @@
+"0","us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+state_map <- merge(us_map, election_data_train, by.x = ""State"", by.y = ""State"", all.x = TRUE)
+us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+state_map <- merge(us_map, election_data_train, by.x = ""State"", by.y = ""State"", all.x = TRUE)
+ggplot(state_map)+
+  geom_map(aes(fill = Obama_margin_percent, x =  long, y = lat, map_id = region), map = us_map, colour=""white"", size = 0.5)+
+  labs(title = ""Obama's Margin in States"", fill = ""Margin(%)"") +
+  theme_void()
+"
+"2","Warning: [38;5;255mIgnoring unknown aesthetics: [32mx[38;5;255m and [32my[38;5;255m[39m"

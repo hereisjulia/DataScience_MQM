@@ -1,0 +1,5 @@
+"0","tree_inSample <- predict(tree, newdata = train_data)
+"
+"2","Error in checkData(oldData, RET) : 
+  Classes of new data do not match original data
+"
