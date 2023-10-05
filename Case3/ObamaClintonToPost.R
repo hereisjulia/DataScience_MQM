@@ -166,7 +166,7 @@ summary(HispanicSimple)
 #### 
 BlackSimple <- glm( Obama_margin_percent ~ Black, data = election_data_train )
 summary(BlackSimple)
-####
+####ohh
 
 ####
 ### Question 4. Second part
@@ -178,11 +178,15 @@ d <- election_data_train$Hispanic
 
 CausalLinear(y,d,x)
 
+a <- summary(glm(y~d+x))
+a$coefficients %>% View()
 
 #### Model with 1771 controls to measure the impact of 1% larger Black demographic
 y <- election_data_train$Obama_margin_percent
 x <- model.matrix( Obama_margin_percent ~ .-Black-Obama_wins-Obama_margin-FIPS-ElectionDate-TotalVote-Clinton-Obama, data = election_data_train )
 d <- election_data_train$Black
+
+
 ####
 
 
