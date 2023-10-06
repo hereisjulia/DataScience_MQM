@@ -1,0 +1,22 @@
+"0","for (k in 1:max_k) {
+  kmeans_result <- kmeans(df3, centers = k, nstart = 25)
+  wss[k] <- kmeans_result$tot.withinss
+}
+"
+"2","Warning: did not converge in 10 iterations"
+"2","Warning: did not converge in 10 iterations"
+"2","Warning: did not converge in 10 iterations"
+"2","Warning: did not converge in 10 iterations"
+"0","for (k in 1:max_k) {"
+"0","  kmeans_result <- kmeans(df3, centers = k, nstart = 25)"
+"0","  wss[k] <- kmeans_result$tot.withinss"
+"0","}"
+"2","Warning: did not converge in 10 iterations"
+"0","# Plot the total within sum of squares vs. number of clusters"
+"0","tibble(k = 1:max_k, wss = wss) %>%"
+"0","  ggplot(aes(x = k, y = wss)) +"
+"0","  geom_line() +"
+"0","  geom_point() +"
+"0","  ggtitle(""Elbow Method for Optimal k"") +"
+"0","  xlab(""Number of clusters (k)"") +"
+"0","  ylab(""Total Within Sum of Squares"")"
