@@ -20,16 +20,8 @@ library(party)
 
 ```{r data prepare}
 election_data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case3/ElectionDataAlone.csv")
-impute_data <- function(vec, mn) {
-  ifelse(is.na(vec), mn, vec)
-}
-data_mean <- sapply(election_data[,10:41],mean, na.rm=TRUE)
-(data_mean)
-for(i in 10:41) {
-  election_data[,i]<-impute_data(election_data[,i],data_mean[i-9])
-}
-summary(election_data)
 
+election_data <- na.omit(election_data)
 #Factor conversion
 election_data$County <- as.factor(election_data$County)
 election_data$State <- as.factor(election_data$State)

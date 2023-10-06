@@ -1,6 +1,4 @@
-"0","us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
-state_map <- merge(us_map, election_data_train, by.x = ""State"", by.y = ""State"", all.x = TRUE)
-us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+"0","state_map <- merge(us_map, election_data_train, by.x = ""State"", by.y = ""State"", all.x = TRUE)
 state_map <- merge(us_map, election_data_train, by.x = ""State"", by.y = ""State"", all.x = TRUE)
 ggplot(state_map)+
   geom_map(aes(fill = Obama_margin_percent, x =  long, y = lat, map_id = region), map = us_map, colour=""white"", size = 0.5)+

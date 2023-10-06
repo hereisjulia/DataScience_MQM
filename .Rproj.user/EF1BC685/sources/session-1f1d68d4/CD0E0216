@@ -1,26 +1,26 @@
 {
-    "id": "DE08DE04",
-    "path": "C:/Users/Ya Chiao Tsai/Downloads/ScriptClass4.R",
-    "project_path": null,
+    "id": "CD0E0216",
+    "path": "E:/MQM_Courses/Term2/Data_Science/DataScienceMQM/Case3/ObamaClintonToPost.R",
+    "project_path": "Case3/ObamaClintonToPost.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1696554476318.0,
+    "created": 1696562324450.0,
     "source_on_save": false,
     "relative_order": 5,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "413,83",
-        "scrollLine": "387"
+        "cursorPosition": "134,24",
+        "scrollLine": "81"
     },
     "folds": "",
-    "lastKnownWriteTime": 1696361462,
+    "lastKnownWriteTime": 1696477062,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1696361462,
+    "last_content_update": 1696477062,
     "read_only": false,
     "read_only_alternatives": []
 }

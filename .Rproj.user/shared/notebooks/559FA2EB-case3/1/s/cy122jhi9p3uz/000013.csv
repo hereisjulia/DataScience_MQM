@@ -1,0 +1,5 @@
+"0","randomForest <- randomForest(Obama_margin_percent ~ ., data = train_data, ntree = 100, mtry = 34, importance = TRUE)
+"
+"2","Error in na.fail.default(list(Obama_margin_percent = c(-21.3068181818182,  : 
+  missing values in object
+"
