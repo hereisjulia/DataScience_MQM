@@ -69,7 +69,7 @@ test_data_OOS <- election_data_train[-train_indices, ]
 
 #Column deletion
 test_data <- subset(test_data_OOS, select = -c(County, State, Region, FIPS))
-train_data <- subset(test_data_OOS, select = -c(County, State, Region, FIPS))
+train_data <- subset(train_data_OOS, select = -c(County, State, Region, FIPS))
 election_data_test <- subset(election_data_test, select = -c(County, State, Region, FIPS))
 
 #Total vote count

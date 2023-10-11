@@ -112,3 +112,4 @@ kIC <- function(fit, rule=c("A","B","C")){
   else 
     return(D +  sqrt( n * log(df) )*df)
 }
+
