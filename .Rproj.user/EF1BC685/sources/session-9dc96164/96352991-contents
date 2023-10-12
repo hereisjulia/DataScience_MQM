@@ -1,0 +1,214 @@
+---
+title: "Case3"
+author: "Julia"
+date: "2023-10-03"
+output: html_document
+---
+
+```{r packages}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(caret)
+library(glmnet)
+library(randomForest)
+library(dplyr)
+library(cluster)
+library(party)
+```
+
+```{r data prepare}
+election_data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/Case3/ElectionDataAlone.csv")
+
+election_data <- na.omit(election_data)
+#Factor conversion
+election_data$County <- as.factor(election_data$County)
+election_data$State <- as.factor(election_data$State)
+election_data$FIPS <- as.factor(election_data$FIPS)
+election_data$Region <- as.factor(election_data$Region)
+election_data$ElectionType <- as.factor(election_data$ElectionType)
+
+#Split the original file
+election_data$ElectionDate <- as.Date(election_data$ElectionDate, format="%m/%d/%Y")
+election_data_train <- election_data[election_data$ElectionDate < as.Date("2/19/2008", format="%m/%d/%Y"), ]
+election_data_test <- election_data[election_data$ElectionDate >= as.Date("2/19/2008", format="%m/%d/%Y"), ]
+
+#Add margins
+election_data_train$Obama_margin <- election_data_train$Obama - election_data_train$Clinton
+election_data_train$Obama_margin_percent <- 100*election_data_train$Obama_margin/election_data_train$TotalVote
+election_data_train$Obama_wins <- ifelse(election_data_train$Obama_margin >0, 1,0)
+```
+# Q1
+1. Pick two (or more) variables and attempt to show a relation between them via visualization. As  discussed before, this requires one to formulate a question, and to communicate clearly a conclusion based on data visualization (specify the why, what, how). (Note that in this question it is not required that the relationship displayed relates to the election.)
+```{r plot1}
+##plot1
+us_map <- map_data("state") 
+state_abbr_mapping <- data.frame(
+  State = tolower(c("Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")),
+  Abbreviation = c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+)
+us_map$State <- state_abbr_mapping$Abbreviation[match(us_map$region, state_abbr_mapping$State)]
+state_map <- merge(us_map, election_data_train, by.x = "State", by.y = "State", all.x = TRUE)
+ggplot(state_map)+
+  geom_map(aes(fill = Obama_margin_percent, x =  long, y = lat, map_id = region), map = us_map, colour="white", size = 0.5)+
+  labs(title = "Obama's Margin in States", fill = "Margin(%)") +
+  theme_void()
+```
+
+```{r plot2}
+##plot2
+a<-election_data_train %>% group_by(Region) %>% summarize(ObamaVotes = mean(Obama/TotalVote)*100, PovertyRate = mean(Poverty))%>%
+  pivot_longer(-c(1), names_to = "type", values_to = "Percent" )
+ggplot(data = a)+
+  geom_col(aes(x = Region, y = Percent, fill = type), position = position_dodge(width = 0.8))+
+  geom_text(aes(x = Region, y = Percent, label = round(Percent,2)))+
+  labs(title = "Votes for Obama (%) vs Poverty Rate (%)")
+```
+
+# Q2
+2. Provide a model to predict the winning spread of Obama over Clinton measured as percentage of the total vote. Describe clearly the core task, briefly discuss all the models you compared, state which metric is being used to evaluate performance, and how did you chose a final model. Apply and report a K-fold cross validation to evaluate the performance of your chosen model. Based on your final model, predict the winning spread percentages for the test sample (provide the R code that generate your predictions). 
+```{r data prepare}
+#Split the training data for OOS
+set.seed(123456) 
+train_indices <- sample(1:nrow(election_data_train), 0.8 * nrow(election_data_train))
+train_data_OOS <- election_data_train[train_indices, ]
+test_data_OOS <- election_data_train[-train_indices, ]  
+
+#Column deletion
+drop1 <- c("County", "State", "Region", "FIPS")
+drop2 <- c("County","State", "Region", "FIPS","Obama_margin","Obama_wins", "TotalVote", "Clinton", "Obama")
+test_data <- test_data_OOS[,!names(test_data_OOS) %in% drop2]
+train_data <- train_data_OOS[,!names(train_data_OOS) %in% drop2]
+election_data_train <- election_data_train[,!names(election_data_train) %in% drop2]
+```
+
+## build models
+```{r}
+#LinearModel
+linearModel <- glm(Obama_margin_percent ~., data = train_data)
+summary(linearModel)
+LM_inSample <- as.numeric(predict(linearModel, newdata = train_data))
+LM_pred <- as.numeric(predict(linearModel, newdata = test_data))
+LM_perform <- cbind(test_data, LM_pred) %>% mutate(LMdiff = LM_pred-Obama_margin_percent)
+```
+
+```{r}
+#CART
+train_data$ElectionDate <- as.numeric(train_data$ElectionDate)
+test_data$ElectionDate <- as.numeric(test_data$ElectionDate)
+
+tree <- ctree(Obama_margin_percent ~., data = train_data) 
+tree_inSample <- predict(tree, newdata = train_data)
+tree_pred <- predict(tree, newdata = test_data)
+tree_perform <- cbind(test_data, tree_pred) 
+names(tree_perform)[36] <- "tree_pred"
+tree_perform <- tree_perform %>% mutate(Treediff = tree_pred - Obama_margin_percent)
+```
+
+```{r}
+#RandomForest
+train_data <- train_data_OOS[,!names(train_data_OOS) %in% drop2]
+test_data <- test_data_OOS[,!names(test_data_OOS) %in% drop2]
+randomForest <- randomForest(Obama_margin_percent ~ ., data = train_data, ntree = 100, mtry = 34, importance = TRUE)
+randomForest_inSample <- predict(randomForest, newdata = train_data)
+randomForest_pred <- predict(randomForest, newdata = test_data)
+randomForest_perform <- cbind(test_data, randomForest_pred)
+randomForest_perform <- randomForest_perform %>% mutate(randomForestdiff = randomForest_pred - Obama_margin_percent)
+```
+
+So, above are the 3 models. We are now going to evaluate and find the best model.
+
+## Evaluation
+
+```{r}
+R2_matrix <- data.frame(
+  "Model" = c("Linear_Model", "CART", "Random_Forest"),
+  "inSample_R2" = c(
+    R2(train_data$Obama_margin_percent, LM_inSample, family = "gaussian"),
+    R2(train_data$Obama_margin_percent, tree_inSample, family = "gaussian"),
+    R2(train_data$Obama_margin_percent, randomForest_inSample, family = "gaussian")
+  ),
+  "OOS_R2" = c(
+    R2(LM_perform$Obama_margin_percent, LM_perform$LM_pred, family = "gaussian"),
+    R2(tree_perform$Obama_margin_percent, tree_perform$tree_pred, family = "gaussian"),
+    R2(randomForest_perform$Obama_margin_percent, randomForest_perform$randomForest_pred, family = "gaussian")
+))
+R2_matrix
+```
+Base on their R2 outcomes, we decided to choose Random Forest as our final model.
+
+## K-fold Cross Validation
+```{r}
+library(caret)
+ctrl <- trainControl(
+  method = "cv",    # Cross-validation method
+  number = 5,      # Number of folds (e.g., 10-fold CV)
+  verboseIter = TRUE
+)
+set.seed(123)  # Set a random seed for reproducibility
+rf_model <- train(
+  x = election_data_train[,!names(election_data_train)=="Obama_margin_percent"],          # Predictor variables
+  y = election_data_train$Obama_margin_percent,          # Target variable
+  method = "rf",  # Random Forest method
+  trControl = ctrl
+)
+```
+```{r}
+ggplot(rf_model$resample)+
+  geom_col(aes(x = Resample, y = Rsquared), fill = "#003087")+
+  geom_text(aes(x = Resample, y = Rsquared + 0.03, label = round(Rsquared,5)))+
+  coord_cartesian(ylim = c(0.4, 1))+
+  labs(title = "5-Fold Cross Validation", x = "", y = "Out of Sample R2")
+```
+
+## Predict
+```{r}
+election_data_test$Obama_margin_percent <- predict(rf_model, newdata = election_data_test)
+```
+
+# Q3
+3. (Optional Question) In order to explore the data, apply one unsupervised learning tool (e.g., kmeans, principal component analysis), interpret and communicate briefly the output (e.g., clusters, latent features), and attempt to obtain insights. 
+```{r}
+subset3 <- select(election_data, -County, -State, - Region, -FIPS, -ElectionDate, -ElectionType, -TotalVote, -Obama, -Clinton)
+df3 <- scale(subset3)
+```
+
+```{r}
+# Number of clusters to consider
+max_k <- 15 
+wss <- numeric(max_k)
+
+for (k in 1:max_k) {
+  kmeans_result <- kmeans(df3, centers = k, nstart = 25)
+  wss[k] <- kmeans_result$tot.withinss
+}
+
+# Plot the total within sum of squares vs. number of clusters
+tibble(k = 1:max_k, wss = wss) %>%
+  ggplot(aes(x = k, y = wss)) +
+  geom_line() +
+  geom_point() +
+  ggtitle("Elbow Method for Optimal k") +
+  xlab("Number of clusters (k)") +
+  ylab("Total Within Sum of Squares")
+```
+
+
+```{r}
+#KMeans
+set.seed(123)
+km.res <- kmeans(df3, 4, nstart = 25)
+print(km.res)
+aggregate(election_data, by=list(cluster=km.res$cluster), mean)
+dd <- cbind(election_data, cluster = km.res$cluster)
+head(dd)
+
+#Heatmap
+cluster_centers <- km.res$centers
+
+heatmap(as.matrix(cluster_centers), 
+        main="Cluster Centers", 
+        scale="row",
+        Colv=NA)  
+```
