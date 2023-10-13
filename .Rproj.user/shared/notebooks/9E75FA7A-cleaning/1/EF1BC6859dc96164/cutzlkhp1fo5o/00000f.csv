@@ -1,4 +1,0 @@
-"0","randomForest <- randomForest(Default~., data = train_data, ntree = 100, mtry = 34, importance = TRUE)
-"
-"2","Warning: The response has five or fewer unique values.  Are you sure you want to do regression?"
-"2","Warning: invalid mtry: reset to within valid range"

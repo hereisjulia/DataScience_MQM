@@ -10,6 +10,8 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 library(stringr)
+library(RColorBrewer)
+library(corrplot)
 ```
 
 ```{r data import}
@@ -22,33 +24,6 @@ summary(data)
 length(data)
 count(data)
 ```
-```{r plot}
-ggplot(data=data)+
-  geom_col(aes(x = Age, y = Default))
-```
-```{r plot}
-ggplot(data=data)+
-  geom_area(aes(x=Income, y=Default))
-```
-Data fro Correlation Map
-```{r}
-library(RColorBrewer)
-library(corrplot)
-testCorr <- data[,-c(1)]
-testCorr$HasMortgage <- ifelse(testCorr$HasMortgage == "Yes", 1, 0)
-testCorr$HasDependents <- ifelse(testCorr$HasDependents == "Yes", 1, 0)
-testCorr$HasCoSigner <- ifelse(testCorr$HasCoSigner == "Yes", 1, 0)
-testCorr <- testCorr[, -c(10,11,12,15)]
-str(testCorr)
-```
-```{r plot}
-Corr <- cor(testCorr)
-Corr
-CorrplotColor <- brewer.pal(n = 8, name = "BrBG")
-corrplot(Corr, method = "color",col = CorrplotColor, tl.col = "black")
-```
-
-
 # Data Cleaning
 
 ```{r data}
@@ -72,10 +47,20 @@ data_clean$LoanPurpose <- as.integer(factor(data_clean$LoanPurpose, levels = nam
 
 data_clean
 ```
+### OOS split
+```{r}
+set.seed(123456) 
+train_indices <- sample(1:nrow(data_clean), 0.8 * nrow(data_clean))
+train_data <- data_clean[train_indices, ]
+test_data <- data_clean[-train_indices, ]  
+```
 
 ```{r plot}
-library(corrplot)
-
+ggplot(data=data_clean)+
+  geom_col(aes(x = Age, y = Default))
+```
+Correlation Map
+```{r plot}
 Corr <- cor(data_clean)
 Corr
 CorrplotColor <- brewer.pal(n = 8, name = "BrBG")
@@ -92,13 +77,7 @@ Models we can use for this Binary question:
 * Random Forest
 * K-Nearest Neighbors
 
-### OOS split
-```{r}
-set.seed(123456) 
-train_indices <- sample(1:nrow(data_clean), 0.8 * nrow(data_clean))
-train_data <- data_clean[train_indices, ]
-test_data <- data_clean[-train_indices, ]  
-```
+
 
 ### logistic regression
 ```{r}
@@ -119,8 +98,13 @@ Tree_pred <- predict(Tree, newdata = test_data)
 ### Random Forest
 ```{r}
 library(randomForest)
-randomForest <- randomForest(Default~., data = train_data, ntree = 100, mtry = 34, importance = TRUE)
+train_data$Default <- as.factor(train_data$Default)
+
+randomForest <- randomForest(Default~., data = train_data)
 randomForest_pred <- predict(randomForest, newdata = test_data)
+```
+```{r}
+
 ```
 
 

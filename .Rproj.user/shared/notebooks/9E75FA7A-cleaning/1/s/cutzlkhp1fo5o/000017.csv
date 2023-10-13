@@ -1,0 +1,24 @@
+"0","library(randomForest)"
+"2","Warning: package ‘randomForest’ was built under R version 4.3.1"
+"2","randomForest 4.7-1.1
+"
+"2","Type rfNews() to see new features/changes/bug fixes.
+"
+"2","
+Attaching package: ‘randomForest’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    combine
+
+"
+"2","The following object is masked from ‘package:ggplot2’:
+
+    margin
+
+"
+"0","train_data$Default <- as.factor(train_data$Default)"
+"0",""
+"0","randomForest <- randomForest(Default~., data = train_data)"
+"0","randomForest_pred <- predict(randomForest, newdata = test_data)"

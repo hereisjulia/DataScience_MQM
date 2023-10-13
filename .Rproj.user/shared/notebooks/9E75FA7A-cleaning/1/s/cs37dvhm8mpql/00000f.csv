@@ -1,5 +1,4 @@
-"0","library(party)
-"
+"0","library(party)"
 "2","Warning: package ‘party’ was built under R version 4.3.1"
 "2","Loading required package: grid
 "
@@ -46,3 +45,5 @@ Attaching package: ‘party’
     where
 
 "
+"0","Tree <- ctree(Default~., data = train_data)"
+"0","Tree_pred <- predict(Tree, newdata = test_data)"
