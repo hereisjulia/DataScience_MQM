@@ -1,4 +1,0 @@
-"0","set.seed(123456) "
-"0","train_indices <- sample(1:nrow(data_clean), 0.8 * nrow(data_clean))"
-"0","train_data <- data_clean[train_indices, ]"
-"0","test_data <- data_clean[-train_indices, ]  "

@@ -18,6 +18,10 @@ library(corrplot)
 data <- read_csv("https://raw.githubusercontent.com/hereisjulia/DataScience_MQM/main/TermProject/Loan_default.csv")
 ```
 
+imputation
+change the N/As into avg. (but no nas)
+
+
 ```{r data overview}
 str(data)
 summary(data)
@@ -45,8 +49,56 @@ data_clean$MaritalStatus <- as.integer(factor(data_clean$MaritalStatus, levels =
 LoanPurpose_mapping <- c("Other" = 0, "Auto" = 1, "Education" = 2, "Home" = 3, "Business" = 4)
 data_clean$LoanPurpose <- as.integer(factor(data_clean$LoanPurpose, levels = names(LoanPurpose_mapping)))
 
+length(data_clean)
 data_clean
 ```
+### Lasso
+
+```{r chatgpt}
+lasso.model <- glmnet(Mx, My, alpha=1)
+cv.lasso <- cv.glmnet(Mx, My, alpha=1)
+optimal.lambda <- cv.lasso$lambda.min
+coef.lasso <- coef(lasso.model, s=optimal.lambda)
+selected.variables <- rownames(coef.lasso)[which(coef.lasso[, 1] != 0)]
+print(selected.variables)
+```
+
+```{r}
+library(glmnet)
+Mx<- model.matrix(Default ~ ., data=data_clean)[,-1]
+My<- data_clean$Default
+```
+
+
+```{r lambda theory}
+num.features <- ncol(Mx)
+num.n <- nrow(Mx)
+num.default <- sum(My)
+w <- (num.default/num.n)*(1-(num.default/num.n))
+lambda.theory <- sqrt(w*log(num.features/0.05)/num.n)
+lassoTheory <- glmnet(Mx,My, family="binomial",lambda = lambda.theory)
+summary(lassoTheory)
+support(lassoTheory$beta)
+colnames(Mx)[support(lassoTheory$beta)]
+### there are in total
+length(support(lassoTheory$beta))
+```
+
+```{r lasso cv}
+lassoCV <- cv.glmnet(Mx,My, family="binomial")
+
+plot(lassoCV, main="Fitting Graph for CV Lasso \n \n # of non-zero coefficients  ", xlab = expression(paste("log(",lambda,")")))
+
+optimal_lambda <- lassoCV$lambda.min
+lasso_optLambda <- glmnet(Mx,My, family="binomial",lambda = optimal_lambda)
+length(support(lasso_optLambda$beta))
+
+coef_matrix <- coef(lasso_optLambda, s = optimal_lambda)
+select_variables <- rownames(coef_matrix)[which(coef_matrix != 0)[-1]]
+select_variables
+# no "LoanTerm"
+```
+
 ### OOS split
 ```{r}
 set.seed(123456) 
@@ -77,21 +129,22 @@ Models we can use for this Binary question:
 * Random Forest
 * K-Nearest Neighbors
 
+## Choosing Variables
 
 
 ### logistic regression
 ```{r}
 logisticRegression <- glm(Default~., data = train_data, family = "binomial")
-logistic_pred <- predict(logisticRegression, newdata = test_data)
-
-summary(logisticRegression)
+logistic_pred <- predict(logisticRegression, newdata = test_data, type = "response")
+logistic_pred <- ifelse(logistic_pred > 0.5, 1, 0)
 ```
 
 ### Decision Trees
 ```{r}
 library(party)
 Tree <- ctree(Default~., data = train_data)
-Tree_pred <- predict(Tree, newdata = test_data)
+Tree_pred <- predict(Tree, newdata = test_data) %>% as.numeric()
+Tree_pred <- ifelse(Tree_pred > 0.5, 1, 0)
 ```
 
 
@@ -101,22 +154,31 @@ library(randomForest)
 train_data$Default <- as.factor(train_data$Default)
 
 randomForest <- randomForest(Default~., data = train_data)
-randomForest_pred <- predict(randomForest, newdata = test_data)
+randomForest_pred <- predict(randomForest, newdata = test_data) %>% as.numeric()
 ```
+
+### Lasso-Logistic
 ```{r}
-
+logisticRegression_lasso <- glm(Default~.-LoanTerm, data = train_data, family = "binomial")
+LassoLogistic_pred <- predict(logisticRegression, newdata = test_data, type = "response")
+LassoLogistic_pred <- ifelse(logistic_pred > 0.5, 1, 0)
 ```
-
-
-## Choosing Variables
-
 
 
 ## Evaluation
+```{r}
+evaluation <- data.frame(
+  actual = test_data$Default,
+  logistic = logistic_pred,
+  tree = Tree_pred,
+  randomForest = randomForest_pred
+)
+# we should use confusion matrix instead
+```
 
 
-
-
+confusion matrix (tp, tn)
+R2
 
 
 
