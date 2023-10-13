@@ -1,0 +1,4 @@
+"0","LassoLogistic_pred <- ifelse(logistic_pred > 0.5, 1, 0)
+"
+"2","Error: object 'logistic_pred' not found
+"

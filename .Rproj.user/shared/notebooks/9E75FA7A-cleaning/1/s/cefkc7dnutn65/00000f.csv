@@ -1,0 +1,2 @@
+"0","ggplot(data=data_clean)+"
+"0","  geom_col(aes(x = Age, y = Default))"

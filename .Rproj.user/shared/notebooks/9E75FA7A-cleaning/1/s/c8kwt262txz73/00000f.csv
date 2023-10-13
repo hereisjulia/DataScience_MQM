@@ -1,0 +1,3 @@
+"0","logisticRegression <- glm(Default~., data = train_data, family = ""binomial"")"
+"0","logistic_pred <- predict(logisticRegression, newdata = test_data, type = ""response"")"
+"0","logistic_pred <- ifelse(logistic_pred > 0.5, 1, 0)"

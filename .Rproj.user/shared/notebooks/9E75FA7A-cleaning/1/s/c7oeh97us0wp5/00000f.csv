@@ -1,0 +1,3 @@
+"0","lasso.model <- glmnet(Mx, My, alpha=1)"
+"2","Error in glmnet(Mx, My, alpha = 1) : could not find function ""glmnet""
+"

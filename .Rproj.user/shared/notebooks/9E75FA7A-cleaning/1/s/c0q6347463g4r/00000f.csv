@@ -1,0 +1,9 @@
+"0","evaluation <- data.frame(
+  actual = test_data$Default,
+  logistic = logistic_pred,
+  tree = Tree_pred,
+  randomForest = randomForest_pred
+)
+"
+"2","Error: object 'logistic_pred' not found
+"
