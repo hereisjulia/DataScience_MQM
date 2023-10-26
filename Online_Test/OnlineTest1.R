@@ -5,7 +5,7 @@
 ###
 ###
 ### Some auxiliary files to load
-source("DataAnalyticsFunctions.R")
+source("./Online_Test/DataAnalyticsFunctions.R")
 #################################################################
 installpkg("quantreg")
 library(quantreg)
@@ -13,12 +13,13 @@ options(warn=-1)
 #################################################################
 ### Load infant weight data
 ###
-load("WorkspaceOnlineTest1.RData")
+load("./Online_Test/WorkspaceOnlineTest1.RData")
 ###
 ### This creates a data frame called "DATA" 
 ### This data set has 198377 observations and 15 variables
 #################################################################
 summary(DATA)
+View(DATA)
 #################################################################
 
 #1. As discussed in class, when considering the birthweight, 
@@ -33,8 +34,6 @@ model.b <- rq(weight ~ ., tau = 0.5, data = DATA)
 model.c <- rq(weight ~ ., tau = 0.1, data = DATA)
 #d) model.d <- rq(weight ~ ., tau = 0.9, data = DATA)
 model.d <- rq(weight ~ ., tau = 0.9, data = DATA)
-
-
 
 #2. A pregnant patient came to the doctor's office concerned with the child. Although she is not gaining weight she is considering to keep smoking. 
 # In order to convince the mother to quit smoking, an appropriate regression model 

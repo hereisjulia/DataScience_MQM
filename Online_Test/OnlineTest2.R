@@ -8,12 +8,12 @@
 ### scripts are in the working directory
 
 ### Some auxiliary files to load
-source("DataAnalyticsFunctions.R")
+source("./Online_Test/DataAnalyticsFunctions.R")
 options(warn=-1)
 
 #################################################################
 ### Load data data
-churndata <- read.csv("customerchurn.csv")
+churndata <- read.csv("./Online_Test/customerchurn.csv")
 churndata$Churn<-factor(churndata$Churn)
 churndata$tenure <- as.numeric(churndata$tenure)
 #################################################################
@@ -99,6 +99,8 @@ for ( val in seq(from = 0, to = 1, by = 0.05)  ){
       values <- FPR_TPR( (result.logistic$fitted >= val) , result.logistic$y )
       points( values$FPR , values$TPR )    
 }
+lines(c(0.1,0.1),c(0,1), lty=2, col = "red")
+
 # Which of the following is not true?
 #a) Good performance should be above the diagonal.
 #b) Although 100% accuracy seems impossible, using this predictive model we can achieve a false positive rate that is 
